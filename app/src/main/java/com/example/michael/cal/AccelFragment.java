@@ -52,8 +52,18 @@ public class AccelFragment extends PlaceholderFragment{
 
         mRunButton = (Button) view.findViewById(R.id.take_data);
         mWalkButton = (ToggleButton) view.findViewById(R.id.walkingToggle);
-        mWalkButton.setEnabled(false);
+        if(savedInstanceState == null) {
+            mWalkButton.setEnabled(false);
+        } else{
+            isRunning = savedInstanceState.getBoolean("isRunning");
+            boolean isWalking = savedInstanceState.getBoolean("isWalking");
 
+            if(isRunning) mWalkButton.setEnabled(true);
+            else mWalkButton.setEnabled(false);
+
+            mWalkButton.setChecked(isWalking);
+
+        }
 
         mRunButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +105,13 @@ public class AccelFragment extends PlaceholderFragment{
 
     public boolean isRunning() {
         return isRunning;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isRunning", isRunning);
+        outState.putBoolean("isWalking", mWalkButton.isChecked());
     }
 
     public interface AccelerometerInterface {

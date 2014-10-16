@@ -12,7 +12,7 @@ import java.util.Date;
  * This is a placeholder for my data saving method. Later, I want to switch to an XML based system.
  */
 public class DataSaverPlaceholder {
-    private String filenameBase = "TempAccelData";
+    private String filenameBase = "CalAccelData";
     private String filename;
     private String timeStamp;
     //private FileOutputStream outputStream;
@@ -32,6 +32,15 @@ public class DataSaverPlaceholder {
         newFile();
 
     }
+    DataSaverPlaceholder(File targetPath, String oldTimeStamp){
+
+        // Create the Target Path
+        path = targetPath;
+        path.mkdirs();
+        timeStamp = oldTimeStamp;
+        openFile();
+
+    }
 
 
     public void updateTimeStamp(){
@@ -46,7 +55,19 @@ public class DataSaverPlaceholder {
 
     public void newFile(){
         updateTimeStamp();
-        filename = filename + timeStamp + ".csv";
+        openFile();
+    }
+
+    public void setTimeStamp(String timeStamp1) {
+        timeStamp = timeStamp1;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void openFile() {
+        filename = filenameBase + timeStamp + ".csv";
         try {
             file = new File(path, filename);
             os = new FileOutputStream(file);
@@ -58,6 +79,7 @@ public class DataSaverPlaceholder {
     public void writeData(String data ){
         try {
             os.write(data.getBytes());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

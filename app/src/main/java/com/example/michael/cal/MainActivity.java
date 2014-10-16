@@ -12,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,6 +24,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
 
 
 public class MainActivity extends Activity
@@ -39,7 +42,8 @@ public class MainActivity extends Activity
     private AccelWindow mAccelWindow;
     private int currPosition;
     private boolean isTakingData, isWalking;
-
+    public String timeStamp;
+    DataSaverPlaceholder myDataLogger;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -64,6 +68,26 @@ public class MainActivity extends Activity
 
         mAccelWindow = new AccelWindow(20);
         currPosition = 0;
+
+        File path = new File(Environment.getExternalStorageDirectory(), "myAccelData");
+
+        if(savedInstanceState == null) {
+            myDataLogger = new DataSaverPlaceholder(path);
+            timeStamp = myDataLogger.getTimeStamp();
+        }
+        else
+        {
+            timeStamp = savedInstanceState.getString("timeStamp");
+            myDataLogger = new DataSaverPlaceholder(path, timeStamp);
+        }
+        isTakingData =false;
+        isWalking = false;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("timeStamp", timeStamp);
     }
 
     @Override
@@ -156,7 +180,10 @@ public class MainActivity extends Activity
             xView.setText(String.valueOf(x));
             yView.setText(String.valueOf(y));
             zView.setText(String.valueOf(z));
-
+            int d_isWalking     = (isWalking) ? 1 : 0;
+            int d_isTakingData  = (isTakingData) ? 1 : 0;
+            String s = String.format("%f, %f, %f, %d, %d;\n", x, y, z, d_isWalking, d_isTakingData);
+            myDataLogger.writeData(s);
             AccelReading reading = new AccelReading(event.values[0], event.values[1], event.values[2]);
             if (mAccelWindow.addReading(reading) == 1) {
 
@@ -208,7 +235,6 @@ public class MainActivity extends Activity
         toast.show();
 
     }
-
 
 
 }
