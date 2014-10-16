@@ -50,6 +50,14 @@ public class AccelFragment extends PlaceholderFragment{
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        init(view, savedInstanceState);
+
+        return view;
+    }
+
+
+
+    protected void init(View view, Bundle savedInstanceState){
         mRunButton = (Button) view.findViewById(R.id.take_data);
         mWalkButton = (ToggleButton) view.findViewById(R.id.walkingToggle);
         if(savedInstanceState == null) {
@@ -93,12 +101,7 @@ public class AccelFragment extends PlaceholderFragment{
                 }
             }
         });
-        return view;
     }
-
-
-
-
     public void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
     }
