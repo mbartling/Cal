@@ -12,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,7 +59,7 @@ public class MainActivity extends Activity
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        mAccelWindow = new AccelWindow();
+        mAccelWindow = new AccelWindow(20);
     }
 
     @Override
@@ -138,7 +139,11 @@ public class MainActivity extends Activity
 
             double variance = mAccelWindow.variance;
             Context context = getApplicationContext();
-            Toast toast = Toast.makeText(context, String.valueOf(variance), Toast.LENGTH_SHORT );
+            //Toast toast = Toast.makeText(context, String.valueOf(variance), Toast.LENGTH_SHORT );
+            //toast.show();
+            TextView textView = (TextView) findViewById(R.id.section_label);
+            textView.setText(String.valueOf(variance));
+            Log.i("Accel Stuff", "Variance = " + variance);
         }
 
 
