@@ -12,21 +12,35 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 
-public class AccelFragment extends MainActivity.PlaceholderFragment{
+public class AccelFragment extends PlaceholderFragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
+    Activity activity;
     private boolean isRunning = false;
     private Button mRunButton;
     private ToggleButton mWalkButton;
-
+    private static final String ARG_SECTION_NUMBER = "section_number";
     public AccelFragment() {
         // Required empty public constructor
     }
 
 
+    public static AccelFragment newInstance(int sectionNumber) {
+        AccelFragment fragment = new AccelFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        this.activity = activity;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,6 +66,21 @@ public class AccelFragment extends MainActivity.PlaceholderFragment{
                     mWalkButton.setEnabled(true);
                 }
                 */
+                try{
+                    ((AccelerometerInterface) activity).setIsTakingData(isRunning);
+                }catch (ClassCastException cce){
+
+                }
+            }
+        });
+
+        mWalkButton.setOnClickListener(new View.OnClickListener(){
+            @Override public void onClick(View view){
+                try{
+                    ((AccelerometerInterface) activity).setWalkingState(mWalkButton.isChecked());
+                }catch (ClassCastException cce){
+
+                }
             }
         });
         return view;
@@ -68,6 +97,11 @@ public class AccelFragment extends MainActivity.PlaceholderFragment{
         return isRunning;
     }
 
+    public interface AccelerometerInterface {
+
+        public void setIsTakingData(boolean state);
+        public void setWalkingState(boolean state);
+    }
 
 
     /*  @Override
@@ -101,5 +135,7 @@ public class AccelFragment extends MainActivity.PlaceholderFragment{
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }*/
+
+
 
 }

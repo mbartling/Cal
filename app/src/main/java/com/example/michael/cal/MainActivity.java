@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 
 public class MainActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SensorEventListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SensorEventListener, AccelFragment.AccelerometerInterface {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -37,6 +37,9 @@ public class MainActivity extends Activity
     private Sensor mAccel;
 
     private AccelWindow mAccelWindow;
+    private int currPosition;
+    private boolean isTakingData, isWalking;
+
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -60,21 +63,29 @@ public class MainActivity extends Activity
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         mAccelWindow = new AccelWindow(20);
+        currPosition = 0;
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        if(position == 0) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, AccelFragment.newInstance(position + 1))
+                    .commit();
+        } else {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .commit();
+        }
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
+
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
@@ -86,6 +97,7 @@ public class MainActivity extends Activity
                 mTitle = getString(R.string.title_section4);
                 break;
         }
+        currPosition = number;
     }
 
     public void restoreActionBar() {
@@ -131,21 +143,34 @@ public class MainActivity extends Activity
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        //float x = event.values[0];
-        //float y = event.values[1];
-        //float z = event.values[2];
-        AccelReading reading = new AccelReading(event.values[0], event.values[1], event.values[2]);
-        if(mAccelWindow.addReading(reading) == 1){
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
 
-            double variance = mAccelWindow.variance;
-            Context context = getApplicationContext();
-            //Toast toast = Toast.makeText(context, String.valueOf(variance), Toast.LENGTH_SHORT );
-            //toast.show();
-            TextView textView = (TextView) findViewById(R.id.section_label);
-            textView.setText(String.valueOf(variance));
-            Log.i("Accel Stuff", "Variance = " + variance);
+
+        if(currPosition == 1) {
+            TextView xView = (TextView) findViewById(R.id.x_val);
+            TextView yView = (TextView) findViewById(R.id.y_val);
+            TextView zView = (TextView) findViewById(R.id.z_val);
+
+            xView.setText(String.valueOf(x));
+            yView.setText(String.valueOf(y));
+            zView.setText(String.valueOf(z));
+
+            AccelReading reading = new AccelReading(event.values[0], event.values[1], event.values[2]);
+            if (mAccelWindow.addReading(reading) == 1) {
+
+                double variance = mAccelWindow.variance;
+                //Context context = getApplicationContext();
+
+
+                //Toast toast = Toast.makeText(context, String.valueOf(variance), Toast.LENGTH_SHORT );
+                //toast.show();
+                TextView textView = (TextView) findViewById(R.id.var_val);
+                textView.setText(String.valueOf(variance));
+                //Log.i("Accel Stuff", "Variance = " + variance);
+            }
         }
-
 
 
     }
@@ -153,7 +178,7 @@ public class MainActivity extends Activity
     @Override
     protected void onResume(){
         super.onResume();
-        mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -161,73 +186,29 @@ public class MainActivity extends Activity
         super.onPause();
         mSensorManager.unregisterListener(this);
     }
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
+    @Override
+    public void setIsTakingData(boolean state) {
+        isTakingData = state;
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class DocFragment extends PlaceholderFragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    @Override
+    public void setWalkingState(boolean state) {
+        isWalking = state;
+        Context context = getApplicationContext();
+        String walkingState;
 
-
-
-        public DocFragment() {
+        if (isWalking)
+        {
+            walkingState = "walking!";
+        } else {
+            walkingState = "Not Walking!";
         }
+        Toast toast = Toast.makeText(context, walkingState , Toast.LENGTH_SHORT );
+        toast.show();
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
     }
+
+
+
 }
