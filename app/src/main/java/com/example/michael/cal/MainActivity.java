@@ -38,6 +38,13 @@ public class MainActivity extends Activity
 
     private SensorManager mSensorManager;
     private Sensor mAccel;
+    private Sensor mProximity;
+
+    private float[] accelVals;
+    private int proximityVal;
+    private float proxMax;
+
+    private float epsilon = 0.0000001f;
 
     private AccelWindow mAccelWindow;
     private int currPosition;
@@ -64,8 +71,13 @@ public class MainActivity extends Activity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        proxMax = mProximity.getMaximumRange(); //Will treat this value as binary close, not-close
+            // See Android Proximity Sensor Documentation
+
+        mSensorManager.registerListener(proximitySensorEventListener, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
         mAccelWindow = new AccelWindow(20);
         currPosition = 0;
 
@@ -82,6 +94,8 @@ public class MainActivity extends Activity
         }
         isTakingData =false;
         isWalking = false;
+
+
     }
 
     @Override
@@ -108,7 +122,36 @@ public class MainActivity extends Activity
                     .commit();
         }
     }
+    SensorEventListener proximitySensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            if(sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY)
+            {
+                proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 1:0;
+                float x = accelVals[0];
+                float y = accelVals[1];
+                float z = accelVals[2];
+                if(currPosition == 1) {
 
+                    TextView pView = (TextView) findViewById(R.id.prox_val);
+
+
+                    pView.setText(String.valueOf(proximityVal));
+
+                    int d_isWalking     = (isWalking) ? 1 : 0;
+                    int d_isTakingData  = (isTakingData) ? 1 : 0;
+                    String s = String.format("%f, %f, %f, %d, %d;\n", x, y, z, d_isWalking, d_isTakingData);
+                    myDataLogger.writeData(s);
+
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
@@ -172,11 +215,18 @@ public class MainActivity extends Activity
         // Do something
     }
 
+
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
+
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        {
+            accelVals = event.values;
+        }
+
+        float x = accelVals[0];
+        float y = accelVals[1];
+        float z = accelVals[2];
 
 
         if(currPosition == 1) {
@@ -184,14 +234,16 @@ public class MainActivity extends Activity
             TextView yView = (TextView) findViewById(R.id.y_val);
             TextView zView = (TextView) findViewById(R.id.z_val);
 
+
             xView.setText(String.valueOf(x));
             yView.setText(String.valueOf(y));
             zView.setText(String.valueOf(z));
+
             int d_isWalking     = (isWalking) ? 1 : 0;
             int d_isTakingData  = (isTakingData) ? 1 : 0;
             String s = String.format("%f, %f, %f, %d, %d;\n", x, y, z, d_isWalking, d_isTakingData);
             myDataLogger.writeData(s);
-            AccelReading reading = new AccelReading(event.values[0], event.values[1], event.values[2]);
+            AccelReading reading = new AccelReading(x,y, z);
             if (mAccelWindow.addReading(reading) == 1) {
 
                 double variance = mAccelWindow.variance;
@@ -213,12 +265,14 @@ public class MainActivity extends Activity
     protected void onResume(){
         super.onResume();
         mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(proximitySensorEventListener, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause(){
         super.onPause();
         mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(proximitySensorEventListener);
     }
 
     @Override
