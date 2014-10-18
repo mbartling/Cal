@@ -19,7 +19,7 @@ public class AccelFragment extends PlaceholderFragment{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     Activity activity;
-    private boolean isRunning;
+    private boolean isTakingData;
     private Button mRunButton;
     private ToggleButton mWalkButton;
 
@@ -40,7 +40,9 @@ public class AccelFragment extends PlaceholderFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true); //Will ignore onDestroy Method (Nested Fragments no need this if parent have it)
+        Log.i("STUPID DEBUG", "BULL Fragment");
+
+        // setRetainInstance(true); //Will ignore onDestroy Method (Nested Fragments no need this if parent have it)
     }
     @Override
     public void onAttach(Activity activity)
@@ -58,30 +60,25 @@ public class AccelFragment extends PlaceholderFragment{
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         init(view, savedInstanceState);
+        if(savedInstanceState != null) {
+            Log.i("OMGADSFADF", "SavedInstance State is not NULL");
+            isTakingData = savedInstanceState.getBoolean("isTakingData");
+            boolean isWalking = savedInstanceState.getBoolean("isWalking");
 
+
+            mWalkButton.setEnabled(isTakingData);
+            mWalkButton.setChecked(isWalking);
+        } else {
+            mWalkButton.setEnabled(false);
+            isTakingData = false;
+        }
+
+
+        Log.i("STUPID DEBUG", "I am now attempting to recover!" + String.valueOf(isTakingData) + " " + String.valueOf(mWalkButton.isChecked()) + " " + String.valueOf(mWalkButton.isEnabled()));
 
         return view;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState){
-        super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState != null) {
-            Log.i("OMGADSFADF", "SavedInstance State is not NULL");
-            isRunning = savedInstanceState.getBoolean("isRunning");
-            boolean isWalking = savedInstanceState.getBoolean("isWalking");
-
-
-            mWalkButton.setEnabled(isRunning);
-            mWalkButton.setChecked(isWalking);
-        } else {
-            mWalkButton.setEnabled(false);
-            isRunning = false;
-        }
-
-
-        Log.i("STUPID DEBUG", "I am now attempting to recover!" + String.valueOf(isRunning) + " " + String.valueOf(mWalkButton.isChecked()) + " " + String.valueOf(mWalkButton.isEnabled()));
-    }
 
 
     protected void init(View view, Bundle savedInstanceState){
@@ -92,11 +89,11 @@ public class AccelFragment extends PlaceholderFragment{
         mRunButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isRunning = !isRunning;
+                isTakingData = !isTakingData;
                 mWalkButton.setEnabled(!mWalkButton.isEnabled());
 
                 try{
-                    ((AccelerometerInterface) activity).setIsTakingData(isRunning);
+                    ((AccelerometerInterface) activity).setIsTakingData(isTakingData);
                 }catch (ClassCastException cce){
 
                 }
@@ -123,19 +120,19 @@ public class AccelFragment extends PlaceholderFragment{
 
 
     public void setRunning(boolean isRunning) {
-        this.isRunning = isRunning;
+        this.isTakingData = isRunning;
     }
 
     public boolean isRunning_f() {
-        return isRunning;
+        return isTakingData;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Log.i("STUPID DEBUG", "I am now saving stuff!" + String.valueOf(isRunning) + " " + String.valueOf(mWalkButton.isChecked()));
-        outState.putBoolean("isRunning", isRunning);
+        Log.i("STUPID DEBUG", "I am now saving stuff!" + String.valueOf(isTakingData) + " " + String.valueOf(mWalkButton.isChecked()));
+        outState.putBoolean("isTakingData", isTakingData);
         outState.putBoolean("isWalking", mWalkButton.isChecked());
 
     }

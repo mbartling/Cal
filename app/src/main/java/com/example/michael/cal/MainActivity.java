@@ -41,7 +41,7 @@ public class MainActivity extends Activity
     private Sensor mProximity;
 
     private float[] accelVals;
-    private int proximityVal;
+    private int proximityVal = 0;
     private float proxMax;
 
     private float epsilon = 0.0000001f;
@@ -51,6 +51,8 @@ public class MainActivity extends Activity
     private boolean isTakingData, isWalking;
     public String timeStamp;
     DataSaverPlaceholder myDataLogger;
+
+    private boolean isSaved;
 
     //Fragment mContent;
     /**
@@ -79,6 +81,7 @@ public class MainActivity extends Activity
         proxMax = mProximity.getMaximumRange(); //Will treat this value as binary close, not-close
             // See Android Proximity Sensor Documentation
 
+        Log.i("STUPID DEBUG", "BULL");
 
         mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -113,22 +116,40 @@ public class MainActivity extends Activity
 
     }
 
+/*    @Override
+    public void onNavigationDrawerItemSelected(
+            int position, boolean fromSavedInstanceState) {
+
+        if (!fromSavedInstanceState) {
+            // update the main content by replacing fragments
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container,
+                            PlaceholderFragment.newInstance(position + 1))
+                    .commit();
+        }
+    }*/
+
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(int position, boolean fromSavedInstanceState) {
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
-        if(position == 0) {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, AccelFragment.newInstance(position + 1))
-                    .commit();
-        } else if(position == 4){
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))
-                    .commit();
-        } else {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                    .commit();
+        if (!fromSavedInstanceState) {
+            FragmentManager fragmentManager = getFragmentManager();
+            if (position == 0) {
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, AccelFragment.newInstance(position + 1))
+                        .commit();
+
+            } else if (position == 4) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))
+                        .commit();
+            } else {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                        .commit();
+            }
         }
     }
     SensorEventListener proximitySensorEventListener = new SensorEventListener() {
@@ -161,6 +182,7 @@ public class MainActivity extends Activity
 
         }
     };
+
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
@@ -266,7 +288,6 @@ public class MainActivity extends Activity
                 //Log.i("Accel Stuff", "Variance = " + variance);
             }
         }
-
 
     }
 
