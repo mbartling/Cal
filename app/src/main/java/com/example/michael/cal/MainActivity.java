@@ -98,6 +98,10 @@ public class MainActivity extends Activity
             fragmentManager.beginTransaction()
                     .replace(R.id.container, AccelFragment.newInstance(position + 1))
                     .commit();
+        } else if(position == 4){
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))
+                    .commit();
         } else {
             fragmentManager.beginTransaction()
                     .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
@@ -119,6 +123,9 @@ public class MainActivity extends Activity
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
+                break;
+            case 5:
+                mTitle = getString(R.string.title_section5);
                 break;
         }
         currPosition = number;
