@@ -19,9 +19,10 @@ public class AccelFragment extends PlaceholderFragment{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     Activity activity;
-    private boolean isRunning = false;
+    private boolean isRunning;
     private Button mRunButton;
     private ToggleButton mWalkButton;
+
     private static final String ARG_SECTION_NUMBER = "section_number";
     public AccelFragment() {
         // Required empty public constructor
@@ -36,6 +37,11 @@ public class AccelFragment extends PlaceholderFragment{
         return fragment;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true); //Will ignore onDestroy Method (Nested Fragments no need this if parent have it)
+    }
     @Override
     public void onAttach(Activity activity)
     {
@@ -52,6 +58,14 @@ public class AccelFragment extends PlaceholderFragment{
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         init(view, savedInstanceState);
+
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
         if(savedInstanceState != null) {
             Log.i("OMGADSFADF", "SavedInstance State is not NULL");
             isRunning = savedInstanceState.getBoolean("isRunning");
@@ -62,14 +76,12 @@ public class AccelFragment extends PlaceholderFragment{
             mWalkButton.setChecked(isWalking);
         } else {
             mWalkButton.setEnabled(false);
+            isRunning = false;
         }
-        TextView temp = (TextView) view.findViewById(R.id.running_val);
-        TextView temp2 = (TextView) view.findViewById(R.id.enabled_val);
-        temp.setText(String.valueOf(isRunning));
-        temp2.setText(String.valueOf(mWalkButton.isEnabled()));
-        return view;
-    }
 
+
+        Log.i("STUPID DEBUG", "I am now attempting to recover!" + String.valueOf(isRunning) + " " + String.valueOf(mWalkButton.isChecked()) + " " + String.valueOf(mWalkButton.isEnabled()));
+    }
 
 
     protected void init(View view, Bundle savedInstanceState){
@@ -82,12 +94,7 @@ public class AccelFragment extends PlaceholderFragment{
             public void onClick(View view) {
                 isRunning = !isRunning;
                 mWalkButton.setEnabled(!mWalkButton.isEnabled());
-                /*if(mWalkButton.isEnabled()) mWalkButton.setEnabled(false);
-                else
-                {
-                    mWalkButton.setEnabled(true);
-                }
-                */
+
                 try{
                     ((AccelerometerInterface) activity).setIsTakingData(isRunning);
                 }catch (ClassCastException cce){
@@ -100,6 +107,7 @@ public class AccelFragment extends PlaceholderFragment{
 
         mWalkButton.setOnClickListener(new View.OnClickListener(){
             @Override public void onClick(View view){
+
                 try{
                     ((AccelerometerInterface) activity).setWalkingState(mWalkButton.isChecked());
                 }catch (ClassCastException cce){
@@ -124,10 +132,11 @@ public class AccelFragment extends PlaceholderFragment{
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
         Log.i("STUPID DEBUG", "I am now saving stuff!" + String.valueOf(isRunning) + " " + String.valueOf(mWalkButton.isChecked()));
         outState.putBoolean("isRunning", isRunning);
         outState.putBoolean("isWalking", mWalkButton.isChecked());
-        super.onSaveInstanceState(outState);
 
     }
 
