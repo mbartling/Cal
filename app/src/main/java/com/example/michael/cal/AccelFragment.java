@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,21 @@ public class AccelFragment extends PlaceholderFragment{
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         init(view, savedInstanceState);
+        if(savedInstanceState != null) {
+            Log.i("OMGADSFADF", "SavedInstance State is not NULL");
+            isRunning = savedInstanceState.getBoolean("isRunning");
+            boolean isWalking = savedInstanceState.getBoolean("isWalking");
 
+
+            mWalkButton.setEnabled(isRunning);
+            mWalkButton.setChecked(isWalking);
+        } else {
+            mWalkButton.setEnabled(false);
+        }
+        TextView temp = (TextView) view.findViewById(R.id.running_val);
+        TextView temp2 = (TextView) view.findViewById(R.id.enabled_val);
+        temp.setText(String.valueOf(isRunning));
+        temp2.setText(String.valueOf(mWalkButton.isEnabled()));
         return view;
     }
 
@@ -60,18 +75,7 @@ public class AccelFragment extends PlaceholderFragment{
     protected void init(View view, Bundle savedInstanceState){
         mRunButton = (Button) view.findViewById(R.id.take_data);
         mWalkButton = (ToggleButton) view.findViewById(R.id.walkingToggle);
-        if(savedInstanceState == null) {
-            mWalkButton.setEnabled(false);
-        } else{
-            isRunning = savedInstanceState.getBoolean("isRunning");
-            boolean isWalking = savedInstanceState.getBoolean("isWalking");
 
-            if(isRunning) mWalkButton.setEnabled(true);
-            else mWalkButton.setEnabled(false);
-
-            mWalkButton.setChecked(isWalking);
-
-        }
 
         mRunButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +93,8 @@ public class AccelFragment extends PlaceholderFragment{
                 }catch (ClassCastException cce){
 
                 }
+
+
             }
         });
 
@@ -101,20 +107,28 @@ public class AccelFragment extends PlaceholderFragment{
                 }
             }
         });
+
+
+
+
     }
+
+
     public void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
     }
 
-    public boolean isRunning() {
+    public boolean isRunning_f() {
         return isRunning;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        Log.i("STUPID DEBUG", "I am now saving stuff!" + String.valueOf(isRunning) + " " + String.valueOf(mWalkButton.isChecked()));
         outState.putBoolean("isRunning", isRunning);
         outState.putBoolean("isWalking", mWalkButton.isChecked());
+        super.onSaveInstanceState(outState);
+
     }
 
     public interface AccelerometerInterface {

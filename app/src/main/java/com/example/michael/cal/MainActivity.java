@@ -51,6 +51,8 @@ public class MainActivity extends Activity
     private boolean isTakingData, isWalking;
     public String timeStamp;
     DataSaverPlaceholder myDataLogger;
+
+    //Fragment mContent;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -77,6 +79,9 @@ public class MainActivity extends Activity
         proxMax = mProximity.getMaximumRange(); //Will treat this value as binary close, not-close
             // See Android Proximity Sensor Documentation
 
+
+        mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
+
         mSensorManager.registerListener(proximitySensorEventListener, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
         mAccelWindow = new AccelWindow(20);
         currPosition = 0;
@@ -89,6 +94,7 @@ public class MainActivity extends Activity
         }
         else
         {
+        //    mContent = getFragmentManager().getFragment(savedInstanceState, "mContent");
             timeStamp = savedInstanceState.getString("timeStamp");
             myDataLogger = new DataSaverPlaceholder(path, timeStamp);
         }
@@ -101,7 +107,10 @@ public class MainActivity extends Activity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+       // FragmentManager fragmentManager = getFragmentManager();
+       // fragmentManager.putFragment(outState, "mContent", mContent);
         outState.putString("timeStamp", timeStamp);
+
     }
 
     @Override
@@ -127,7 +136,7 @@ public class MainActivity extends Activity
         public void onSensorChanged(SensorEvent sensorEvent) {
             if(sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY)
             {
-                proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 1:0;
+                proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 0:1;
                 float x = accelVals[0];
                 float y = accelVals[1];
                 float z = accelVals[2];
@@ -140,7 +149,7 @@ public class MainActivity extends Activity
 
                     int d_isWalking     = (isWalking) ? 1 : 0;
                     int d_isTakingData  = (isTakingData) ? 1 : 0;
-                    String s = String.format("%f, %f, %f, %d, %d;\n", x, y, z, d_isWalking, d_isTakingData);
+                    String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
                     myDataLogger.writeData(s);
 
                 }
@@ -241,7 +250,7 @@ public class MainActivity extends Activity
 
             int d_isWalking     = (isWalking) ? 1 : 0;
             int d_isTakingData  = (isTakingData) ? 1 : 0;
-            String s = String.format("%f, %f, %f, %d, %d;\n", x, y, z, d_isWalking, d_isTakingData);
+            String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
             myDataLogger.writeData(s);
             AccelReading reading = new AccelReading(x,y, z);
             if (mAccelWindow.addReading(reading) == 1) {
