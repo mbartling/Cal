@@ -13,6 +13,7 @@ Contents:
 
    intro
    from_prev
+   cal_arch
    init_experiments
    bibliography
 
