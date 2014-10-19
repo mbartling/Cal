@@ -1,0 +1,43 @@
+digraph hmm_tree {
+
+	
+	root -> group_0;
+	root -> group_1;
+
+	group_0 -> leaf_0;
+	group_0 -> leaf_1;
+	group_1 -> leaf_2;
+
+	leaf_0 -> state_1_0;
+	leaf_1 -> state_1_1;
+	leaf_2 -> state_1_2;
+
+	subgraph leaf_0 {
+		state_1_0 -> state_2_0 [ label = "P12_0" ];
+		state_1_0 -> state_1_0 [ label = "P11_0" ];
+		state_1_0 -> state_3_0 [ label = "P13_0" ];
+		state_2_0 -> state_2_0 [ label = "P22_0" ];
+		state_2_0 -> state_3_0 [ label = "P23_0" ];
+		state_3_0 -> state_1_0 [ label = "P31_0" ];
+	}
+	
+	subgraph leaf_1 {
+		state_1_1 -> state_2_1 [ label = "P12_1" ];
+		state_1_1 -> state_1_1 [ label = "P11_1" ];
+		state_1_1 -> state_3_1 [ label = "P13_1" ];
+		state_2_1 -> state_2_1 [ label = "P22_1" ];
+		state_2_1 -> state_3_1 [ label = "P23_1" ];
+		state_3_1 -> state_1_1 [ label = "P31_1" ];
+	}
+	
+	
+	subgraph leaf_2 {
+		state_1_2 -> state_2_2 [ label = "P12_2" ];
+		state_1_2 -> state_1_2 [ label = "P11_2" ];
+		state_1_2 -> state_3_2 [ label = "P13_2" ];
+		state_2_2 -> state_2_2 [ label = "P22_2" ];
+		state_2_2 -> state_3_2 [ label = "P23_2" ];
+		state_3_2 -> state_1_2 [ label = "P31_2" ];
+	}
+
+}

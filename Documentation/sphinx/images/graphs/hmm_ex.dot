@@ -1,0 +1,9 @@
+digraph hmm_ex {
+
+	state_1 -> state_2 [ label = "P12" ];
+	state_1 -> state_1 [ label = "P11" ];
+	state_1 -> state_3 [ label = "P13" ];
+	state_2 -> state_2 [ label = "P22" ];
+	state_2 -> state_3 [ label = "P23" ];
+	state_3 -> state_1 [ label = "P31" ];
+}

@@ -1,0 +1,33 @@
+digraph wakeup_fsm {
+	rankdir=LR;
+
+	node [shape = doublecircle]; Project_Broadcast Joined_with_Capabilities;
+	node [shape = circle, style=filled, color=lightgrey] NSD_Scanning;
+	node [shape = circle, style="", color=black]; 
+
+	NSD_Scanning -> Project_Scan [ label = "Cal Service Discovered" ];
+	Project_Scan -> Join_Request [ label = "onProjectSel" ];
+
+	subgraph cluster_1 {
+		Join_Request -> Resolve_Capabilities [ label = "onRequestAck" ];
+		Resolve_Capabilities -> Joined_with_Capabilities [ label = "onCapabilityAck" ];
+
+		label = "Project Context";
+	}
+	NSD_Scanning -> Add_Project_Broadcast [label = "onNewProject" ];
+	Project_Scan -> Add_Project_Broadcast [label = "onNewProject" ];
+
+	NSD_Scanning -> Project_Broadcast [ label = "onSystemInit" ];
+
+	subgraph cluster_0 {
+		Add_Project_Broadcast -> Project_Broadcast;
+		rankdir=TB;
+		label = "Project Broadcast";
+	}
+	
+	Project_Broadcast -> NSD_Scanning;
+	Joined_with_Capabilities -> NSD_Scanning;
+
+
+
+}
