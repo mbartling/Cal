@@ -29,24 +29,14 @@ import java.io.File;
 
 
 public class MainActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SensorEventListener, AccelFragment.AccelerometerInterface {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccelFragment.AccelerometerInterface{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
-    private SensorManager mSensorManager;
-    private Sensor mAccel;
-    private Sensor mProximity;
 
-    private float[] accelVals;
-    private int proximityVal = 0;
-    private float proxMax;
-
-    private float epsilon = 0.0000001f;
-
-    private AccelWindow mAccelWindow;
     private int currPosition;
     private boolean isTakingData, isWalking;
     public String timeStamp;
@@ -74,33 +64,9 @@ public class MainActivity extends Activity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        proxMax = mProximity.getMaximumRange(); //Will treat this value as binary close, not-close
-            // See Android Proximity Sensor Documentation
-
-        Log.i("STUPID DEBUG", "BULL");
-
-        mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
-
-        mSensorManager.registerListener(proximitySensorEventListener, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
-        mAccelWindow = new AccelWindow(20);
         currPosition = 0;
 
-        File path = new File(Environment.getExternalStorageDirectory(), "myAccelData");
-
-        if(savedInstanceState == null) {
-            myDataLogger = new DataSaverPlaceholder(path);
-            timeStamp = myDataLogger.getTimeStamp();
-        }
-        else
-        {
-        //    mContent = getFragmentManager().getFragment(savedInstanceState, "mContent");
-            timeStamp = savedInstanceState.getString("timeStamp");
-            myDataLogger = new DataSaverPlaceholder(path, timeStamp);
-        }
         isTakingData =false;
         isWalking = false;
 
@@ -152,36 +118,6 @@ public class MainActivity extends Activity
             }
         }
     }
-    SensorEventListener proximitySensorEventListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            if(sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY)
-            {
-                proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 0:1;
-                float x = accelVals[0];
-                float y = accelVals[1];
-                float z = accelVals[2];
-                if(currPosition == 1) {
-
-                    TextView pView = (TextView) findViewById(R.id.prox_val);
-
-
-                    pView.setText(String.valueOf(proximityVal));
-
-                    int d_isWalking     = (isWalking) ? 1 : 0;
-                    int d_isTakingData  = (isTakingData) ? 1 : 0;
-                    String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
-                    myDataLogger.writeData(s);
-
-                }
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {
-
-        }
-    };
 
     public void onSectionAttached(int number) {
         switch (number) {
@@ -239,70 +175,18 @@ public class MainActivity extends Activity
     }
 
 
-    /* Accelerometer Stuff */
 
-    @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something
-    }
-
-
-    @Override
-    public final void onSensorChanged(SensorEvent event) {
-
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-        {
-            accelVals = event.values;
-        }
-
-        float x = accelVals[0];
-        float y = accelVals[1];
-        float z = accelVals[2];
-
-
-        if(currPosition == 1) {
-            TextView xView = (TextView) findViewById(R.id.x_val);
-            TextView yView = (TextView) findViewById(R.id.y_val);
-            TextView zView = (TextView) findViewById(R.id.z_val);
-
-
-            xView.setText(String.valueOf(x));
-            yView.setText(String.valueOf(y));
-            zView.setText(String.valueOf(z));
-
-            int d_isWalking     = (isWalking) ? 1 : 0;
-            int d_isTakingData  = (isTakingData) ? 1 : 0;
-            String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
-            myDataLogger.writeData(s);
-            AccelReading reading = new AccelReading(x,y, z);
-            if (mAccelWindow.addReading(reading) == 1) {
-
-                double variance = mAccelWindow.variance;
-                //Context context = getApplicationContext();
-
-
-                //Toast toast = Toast.makeText(context, String.valueOf(variance), Toast.LENGTH_SHORT );
-                //toast.show();
-                TextView textView = (TextView) findViewById(R.id.var_val);
-                textView.setText(String.valueOf(variance));
-                //Log.i("Accel Stuff", "Variance = " + variance);
-            }
-        }
-
-    }
 
     @Override
     protected void onResume(){
         super.onResume();
-        mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(proximitySensorEventListener, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        mSensorManager.unregisterListener(this);
-        mSensorManager.unregisterListener(proximitySensorEventListener);
+
     }
 
     @Override
