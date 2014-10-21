@@ -16,27 +16,29 @@ public class CalSqlAdapter {
     public CalSqlAdapter(Context context){
         helper = new CalSqlHelper(context);
     }
-    public long insertData(long timeStamp, float x, float y, float z, float proximityVal, float lux, int d_isWalking, int d_isTrainingData) {
+    public long insertData(CalSQLObj SQLObj) {
 
         SQLiteDatabase db = helper.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(CalSqlHelper.UID, timeStamp);
-        contentValues.put(CalSqlHelper.ENTRY_X, x);
-        contentValues.put(CalSqlHelper.ENTRY_Y, y);
-        contentValues.put(CalSqlHelper.ENTRY_Z, z);
-        contentValues.put(CalSqlHelper.ENTRY_P, proximityVal);
-        contentValues.put(CalSqlHelper.ENTRY_LUX, lux);
-        contentValues.put(CalSqlHelper.ENTRY_IS_WALKING, d_isWalking);
-        contentValues.put(CalSqlHelper.ENTRY_IS_TRAINING_DATA, d_isTrainingData);
+        contentValues.put(CalSqlHelper.UID, SQLObj.getTimeStamp());
+        contentValues.put(CalSqlHelper.ENTRY_X, SQLObj.getY());
+        contentValues.put(CalSqlHelper.ENTRY_Y, SQLObj.getY());
+        contentValues.put(CalSqlHelper.ENTRY_Z, SQLObj.getZ());
+        contentValues.put(CalSqlHelper.ENTRY_P, SQLObj.getProximityVal());
+        contentValues.put(CalSqlHelper.ENTRY_LUX, SQLObj.getLux());
+        contentValues.put(CalSqlHelper.ENTRY_IS_WALKING, SQLObj.getD_isWalking());
+        contentValues.put(CalSqlHelper.ENTRY_IS_TRAINING_DATA, SQLObj.getD_isTrainingData());
 
         long id = db.insert(CalSqlHelper.TABLE_NAME, null, contentValues);
-
-        if(id != timeStamp){
+        db.close();
+        if(id != SQLObj.getTimeStamp()){
             Log.e("CalSqlAdapter", "Error inserting row into NthSense! id returned is " + String.valueOf(id));
         }
         return id;
     }
+
+
 
     static class CalSqlHelper extends SQLiteOpenHelper {
 
