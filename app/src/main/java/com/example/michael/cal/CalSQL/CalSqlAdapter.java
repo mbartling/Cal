@@ -1,5 +1,7 @@
 package com.example.michael.cal.CalSQL;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -45,7 +47,21 @@ public class CalSqlAdapter {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.UID + "=" + timestamp, null);
         c.moveToFirst();
-        return c.getString(1)+"; TAKING DATA: "+Integer.toString(c.getInt(7));
+        return c.getString(1) + "; TAKING DATA: " + Integer.toString(c.getInt(7)) + "; ACCT: "+getGoogleEmail();
+    }
+
+    public String getGoogleEmail() {
+        //not sure if I should just save the context reference from this class itself
+        AccountManager am = (AccountManager) helper.context.getSystemService(helper.context.ACCOUNT_SERVICE);
+        Account[] accounts = am.getAccounts();
+        for (Account a : accounts) {
+            //apparently, the "main" account on the device will be returned first in this list
+            if (a.type.equals("com.google")) {
+                //Not really sure whether this pulls an email address or not. TO FIX LATER IF NECESSARY.
+                return a.name.split("@")[0];
+            }
+        }
+        return null;
     }
 
 
@@ -55,7 +71,6 @@ public class CalSqlAdapter {
         private static final String TABLE_NAME = "NthSense";
         public static final String UID = "_id"; //The UID will actually be the nanosecond
         // Sensor event (should last for 200+ years)
-
 
         private static final String ENTRY_X = "xVal";
         private static final String ENTRY_Y = "yVal";
