@@ -2,6 +2,7 @@ package com.example.michael.cal.CalSQL;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -13,9 +14,11 @@ import android.util.Log;
 public class CalSqlAdapter {
 
     CalSqlHelper helper;
-    public CalSqlAdapter(Context context){
+
+    public CalSqlAdapter(Context context) {
         helper = new CalSqlHelper(context);
     }
+
     public long insertData(CalSQLObj SQLObj) {
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -32,12 +35,18 @@ public class CalSqlAdapter {
 
         long id = db.insert(CalSqlHelper.TABLE_NAME, null, contentValues);
         db.close();
-        if(id != SQLObj.getTimeStamp()){
+        if (id != SQLObj.getTimeStamp()) {
             Log.e("CalSqlAdapter", "Error inserting row into NthSense! id returned is " + String.valueOf(id));
         }
         return id;
     }
 
+    public String pullTestData(long timestamp) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.UID + "=" + timestamp, null);
+        c.moveToFirst();
+        return c.getString(1)+"; TAKING DATA: "+Integer.toString(c.getInt(7));
+    }
 
 
     static class CalSqlHelper extends SQLiteOpenHelper {
