@@ -92,7 +92,7 @@ public class NthSense extends Service implements SensorEventListener {
 
 
         calSqlAdapter.insertData(timeStamp, x, y, z, proximityVal, lux, d_isWalking, d_isTrainingData);
-
+        Log.i("Grant", "DATABASE OUTPUT: "+calSqlAdapter.pullTestData(timeStamp)+"; should be "+x);
     }
 
     @Override
