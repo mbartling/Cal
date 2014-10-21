@@ -12,5 +12,6 @@
     <string name="action_example">Ok Cal</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="training_button_text">Take Training Data!</string>
     <string name="cal_nsd_name">NsdCalProject</string>
 </resources>

@@ -36,7 +36,7 @@ public class MainActivity extends Activity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    CalSqlAdapter calSqlAdapter;
+    //CalSqlAdapter calSqlAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +58,9 @@ public class MainActivity extends Activity
         isTakingData =false;
         isWalking = false;
 
-        calSqlAdapter = new CalSqlAdapter(this);
+        //calSqlAdapter = new CalSqlAdapter(this);
 
-        SQLiteDatabase sensorDatabase = calSqlAdapter.getWritableDatabase();
+        //SQLiteDatabase sensorDatabase = calSqlAdapter.getWritableDatabase();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class MainActivity extends Activity
             if (position == 0) {
 
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, AccelFragment.newInstance(position + 1))
+                        .replace(R.id.container, TrainingFragment.newInstance(position + 1))
                         .commit();
 
             } else if (position == 4) {

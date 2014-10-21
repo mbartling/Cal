@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#33B5E5"
+    >
+
+    <ToggleButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/take_data1"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textOn="You are Taking Training Data!"
+        android:textOff="@string/training_button_text"
+        android:checked="false" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New ToggleButton"
+        android:id="@+id/walkingToggle1"
+        android:layout_above="@+id/take_data1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="38dp"
+        android:textOff="Not Walking"
+        android:textOn="Is Walking" />
+</RelativeLayout>

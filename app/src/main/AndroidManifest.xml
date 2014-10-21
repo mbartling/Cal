@@ -22,7 +22,7 @@
         <service
             android:name=".NthSense"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="false" >
         </service>
     </application>
 

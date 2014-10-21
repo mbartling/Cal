@@ -9,9 +9,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
+
+import java.net.BindException;
 
 public class NthSense extends Service implements SensorEventListener {
     private SensorManager mSensorManager;
@@ -19,8 +23,9 @@ public class NthSense extends Service implements SensorEventListener {
     private Sensor mProximity;
     private Sensor mLight;
 
+    private IBinder mBinder = new NthBinder();
 
-    private float[] accelVals;
+    private float[] accelVals = new float[3];
     private int proximityVal = 0;
     private float proxMax;
     private float lux;
@@ -58,7 +63,8 @@ public class NthSense extends Service implements SensorEventListener {
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        //throw new UnsupportedOperationException("Not yet implemented");\
+        return mBinder;
     }
 
     @Override
@@ -84,6 +90,7 @@ public class NthSense extends Service implements SensorEventListener {
         int d_isTrainingData = (isTakingData) ? 1 : 0;
         //String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
 
+
         calSqlAdapter.insertData(timeStamp, x, y, z, proximityVal, lux, d_isWalking, d_isTrainingData);
 
     }
@@ -98,5 +105,23 @@ public class NthSense extends Service implements SensorEventListener {
         super.onDestroy();
         mSensorManager.unregisterListener(this);
 
+    }
+
+
+    public class NthBinder extends Binder {
+        NthSense getService() {
+            return NthSense.this;
+        }
+    }
+
+    public void set_is_walking(boolean is_walking)
+    {
+        this.isWalking = is_walking;
+        Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
+    }
+    public void set_is_takingData(boolean is_takingData)
+    {
+        this.isTakingData = is_takingData;
+        Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
     }
 }
