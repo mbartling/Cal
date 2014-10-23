@@ -71,7 +71,7 @@ public class NthSense extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
 
-        long timeStamp = sensorEvent.timestamp;
+        //long timeStamp = sensorEvent.timestamp;
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 0 : 1;
         }
@@ -92,8 +92,15 @@ public class NthSense extends Service implements SensorEventListener {
         //String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
 
 
-        calSqlAdapter.insertData(new CalSQLObj(timeStamp, x, y, z, proximityVal, lux, d_isWalking, d_isTrainingData));
-        Log.i("Grant", "DATABASE OUTPUT: "+calSqlAdapter.pullTestData(timeStamp)+"; should be "+x);
+        long timestamp = System.currentTimeMillis();
+        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into db
+
+        CalSQLObj so = calSqlAdapter.getSingleData(timestamp); //Read data from the db using the recently entered timestamp as identifier and print out information using the log command below.
+        Log.i("db data", "timeStamp: " + so.getTimestamp() + ", xVal: " + so.getxVal() + ", yVal: " + so.getyVal() + ", zVal: " + so.getzVal() +
+        ", proxVal: " + so.getProxVal() + ", lxuVal: " + so.getLuxVal() + ", isWalking: " + so.getIsWalking() + ", isTraining: " + so.getIsTraining());
+
+        //Below is the old logging command
+        //Log.i("Grant", "DATABASE OUTPUT: " + calSqlAdapter.pullTestData(timeStamp) + "; should be " + x);
     }
 
     @Override
