@@ -63,6 +63,11 @@ public class TrainingFragment extends PlaceholderFragment {
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    public void onDestroy() { //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
+        super.onDestroy();
+        getActivity().unbindService(mConnection);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
