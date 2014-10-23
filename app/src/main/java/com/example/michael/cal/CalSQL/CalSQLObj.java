@@ -4,98 +4,98 @@ package com.example.michael.cal.CalSQL;
  * Created by Kyle on 10/21/2014.
  */
 public class CalSQLObj {
-   // public long insertData(long timeStamp, float x, float y, float z, float proximityVal, float lux, int d_isWalking, int d_isTrainingData) {
-    private long unixTime = System.currentTimeMillis();
-    private long timeStamp;
-    private float x;
-    private float y;
-    private float z;
-    private float proximityVal;
-    private float lux;
-    private int d_isWalking;
-    private int d_isTrainingData;
+    private long timestamp;
+    private float xVal;
+    private float yVal;
+    private float zVal;
+    private float proxVal;
+    private float luxVal;
+    private int isWalking;
+    private int isTraining;
 
-    public CalSQLObj(long timeStamp, float x, float y, float z, float proximityVal, float lux, int d_isWalking, int d_isTrainingData) {
-        this.setUnixTime(unixTime);
-        this.setTimeStamp(timeStamp);
-        this.setX(x);
-        this.setY(y);
-        this.setZ(z);
-        this.setProximityVal(proximityVal);
-        this.setLux(lux);
-        this.setD_isWalking(d_isWalking);
-        this.setD_isTrainingData(d_isTrainingData);
+    public CalSQLObj(float xVal, float yVal, float zVal, float proxVal, float luxVal, int isWalking, int isTraining, long timestamp) {
+        this.setxVal(xVal);
+        this.setyVal(yVal);
+        this.setzVal(zVal);
+        this.setProxVal(proxVal);
+        this.setLuxVal(luxVal);
+        this.setIsWalking(isWalking);
+        this.setIsTraining(isTraining);
+        this.setTimestamp(timestamp);
     }
 
-    public long getTimeStamp() {
-        return timeStamp;
+    public CalSQLObj(float xVal, float yVal, float zVal, float proxVal, float luxVal, int isWalking, int isTraining) {
+        this.xVal = xVal;
+        this.yVal = yVal;
+        this.zVal = zVal;
+        this.proxVal = proxVal;
+        this.luxVal = luxVal;
+        this.isWalking = isWalking;
+        this.isTraining = isTraining;
+        this.timestamp = System.currentTimeMillis();
     }
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public float getX() {
-        return x;
+    public void setTimestamp(long timeStamp) {
+        this.timestamp = timeStamp;
     }
 
-    public void setX(float x) {
-        this.x = x;
+    public float getxVal() {
+        return xVal;
     }
 
-    public float getY() {
-        return y;
+    public void setxVal(float xVal) {
+        this.xVal = xVal;
     }
 
-    public void setY(float y) {
-        this.y = y;
+    public float getyVal() {
+        return yVal;
     }
 
-    public float getZ() {
-        return z;
+    public void setyVal(float yVal) {
+        this.yVal = yVal;
     }
 
-    public void setZ(float z) {
-        this.z = z;
+    public float getzVal() {
+        return zVal;
     }
 
-    public float getProximityVal() {
-        return proximityVal;
+    public void setzVal(float zVal) {
+        this.zVal = zVal;
     }
 
-    public void setProximityVal(float proximityVal) {
-        this.proximityVal = proximityVal;
+    public float getProxVal() {
+        return proxVal;
     }
 
-    public float getLux() {
-        return lux;
+    public void setProxVal(float proxVal) {
+        this.proxVal = proxVal;
     }
 
-    public void setLux(float lux) {
-        this.lux = lux;
+    public float getLuxVal() {
+        return luxVal;
     }
 
-    public int getD_isWalking() {
-        return d_isWalking;
+    public void setLuxVal(float luxVal) {
+        this.luxVal = luxVal;
     }
 
-    public void setD_isWalking(int d_isWalking) {
-        this.d_isWalking = d_isWalking;
+    public int getIsWalking() {
+        return isWalking;
     }
 
-    public int getD_isTrainingData() {
-        return d_isTrainingData;
+    public void setIsWalking(int isWalking) {
+        this.isWalking = isWalking;
     }
 
-    public void setD_isTrainingData(int d_isTrainingData) {
-        this.d_isTrainingData = d_isTrainingData;
+    public int getIsTraining() {
+        return isTraining;
     }
 
-    public long getUnixTime() {
-        return unixTime;
-    }
-
-    public void setUnixTime(long unixTime) {
-        this.unixTime = unixTime;
+    public void setIsTraining(int isTraining) {
+        this.isTraining = isTraining;
     }
 }
