@@ -5,14 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ToggleButton;
 import android.os.IBinder;
-import android.os.PowerManager;
 
 /**
  * Created by michael on 10/21/14.
@@ -24,10 +21,7 @@ public class TrainingFragment extends PlaceholderFragment {
     private ToggleButton mTakingDataButton;
     private ToggleButton mWalkButton;
 
-    private PowerManager.WakeLock mWakeLock;
     NthSense sensorService;
-
-    boolean mBound = false;
 
     public static TrainingFragment newInstance(int sectionNumber) {
         TrainingFragment fragment = new TrainingFragment();
@@ -59,54 +53,32 @@ public class TrainingFragment extends PlaceholderFragment {
             }
         });
 
-        PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake_lock");
-       // Log.i("Tony", "WAKE_LOCK: AQUIRED");
-        //mWakeLock.acquire();
-
         return rootView;
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-       // Log.i("Tony", "WAKE_LOCK: RELEASED");
-        //mWakeLock.release();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // Bind to LocalService
         Intent intent = new Intent(getActivity(), NthSense.class);
-        //Context context = getActivity().getApplicationContext();
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mBound){
-         //   getActivity().unbindService(mConnection);
-            mBound = !mBound;
-        }
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
+        public void onServiceConnected(ComponentName className, IBinder service) {
             NthSense.NthBinder binder = (NthSense.NthBinder) service;
             sensorService = binder.getService();
-            mBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
+
         }
     };
 
