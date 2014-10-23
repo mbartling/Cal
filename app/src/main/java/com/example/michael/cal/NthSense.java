@@ -37,6 +37,7 @@ public class NthSense extends Service implements SensorEventListener {
     private boolean isWalking, isTakingData;
 
     public NthSense() {
+
     }
 
     @Override
@@ -57,8 +58,6 @@ public class NthSense extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
 
         calSqlAdapter = new CalSqlAdapter(this);
-
-
     }
 
     @Override
@@ -70,7 +69,6 @@ public class NthSense extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-
         //long timeStamp = sensorEvent.timestamp;
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 0 : 1;
@@ -90,7 +88,6 @@ public class NthSense extends Service implements SensorEventListener {
         int d_isWalking = (isWalking) ? 1 : 0;
         int d_isTrainingData = (isTakingData) ? 1 : 0;
         //String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
-
 
         long timestamp = System.currentTimeMillis();
         calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into db
@@ -112,9 +109,7 @@ public class NthSense extends Service implements SensorEventListener {
     public void onDestroy() {
         super.onDestroy();
         mSensorManager.unregisterListener(this);
-
     }
-
 
     public class NthBinder extends Binder {
         NthSense getService() {
