@@ -1,7 +1,10 @@
 package com.example.michael.cal.CalSQL;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -13,9 +16,11 @@ import android.util.Log;
 public class CalSqlAdapter {
 
     CalSqlHelper helper;
-    public CalSqlAdapter(Context context){
+
+    public CalSqlAdapter(Context context) {
         helper = new CalSqlHelper(context);
     }
+
     public long insertData(CalSQLObj SQLObj) {
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -32,12 +37,32 @@ public class CalSqlAdapter {
 
         long id = db.insert(CalSqlHelper.TABLE_NAME, null, contentValues);
         db.close();
-        if(id != SQLObj.getTimeStamp()){
+        if (id != SQLObj.getTimeStamp()) {
             Log.e("CalSqlAdapter", "Error inserting row into NthSense! id returned is " + String.valueOf(id));
         }
         return id;
     }
 
+    public String pullTestData(long timestamp) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.UID + "=" + timestamp, null);
+        c.moveToFirst();
+        return c.getString(1) + "; TAKING DATA: " + Integer.toString(c.getInt(7)) + "; ACCT: "+getGoogleEmail();
+    }
+
+    public String getGoogleEmail() {
+        //not sure if I should just save the context reference from this class itself
+        AccountManager am = (AccountManager) helper.context.getSystemService(helper.context.ACCOUNT_SERVICE);
+        Account[] accounts = am.getAccounts();
+        for (Account a : accounts) {
+            //apparently, the "main" account on the device will be returned first in this list
+            if (a.type.equals("com.google")) {
+                //Not really sure whether this pulls an email address or not. TO FIX LATER IF NECESSARY.
+                return a.name.split("@")[0];
+            }
+        }
+        return null;
+    }
 
 
     static class CalSqlHelper extends SQLiteOpenHelper {
@@ -46,7 +71,6 @@ public class CalSqlAdapter {
         private static final String TABLE_NAME = "NthSense";
         public static final String UID = "_id"; //The UID will actually be the nanosecond
         // Sensor event (should last for 200+ years)
-
 
         private static final String ENTRY_X = "xVal";
         private static final String ENTRY_Y = "yVal";

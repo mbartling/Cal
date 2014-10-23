@@ -15,7 +15,7 @@ public class CalSQLObj {
     private int d_isWalking;
     private int d_isTrainingData;
 
-    public CalSQLObj(long unixTime, long timeStamp, float x, float y, float z, float proximityVal, float lux, int d_isWalking, int d_isTrainingData) {
+    public CalSQLObj(long timeStamp, float x, float y, float z, float proximityVal, float lux, int d_isWalking, int d_isTrainingData) {
         this.setUnixTime(unixTime);
         this.setTimeStamp(timeStamp);
         this.setX(x);

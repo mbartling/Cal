@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
+import com.example.michael.cal.CalSQL.CalSQLObj;
 
 import java.net.BindException;
 
@@ -91,8 +92,8 @@ public class NthSense extends Service implements SensorEventListener {
         //String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
 
 
-        calSqlAdapter.insertData(timeStamp, x, y, z, proximityVal, lux, d_isWalking, d_isTrainingData);
-
+        calSqlAdapter.insertData(new CalSQLObj(timeStamp, x, y, z, proximityVal, lux, d_isWalking, d_isTrainingData));
+        Log.i("Grant", "DATABASE OUTPUT: "+calSqlAdapter.pullTestData(timeStamp)+"; should be "+x);
     }
 
     @Override
