@@ -162,7 +162,8 @@ public class CalSqlAdapter {
                 ENTRY_ISTRAINING + " INTEGER " +
                 ");";
         private static final String DROP_TABLE = "DROP TABLE IF EXISTS" + TABLE_NAME;
-        private static final int DATABASE_VERSION = 1;
+
+        private static final int DATABASE_VERSION = 2;
 
         private Context context;
 
