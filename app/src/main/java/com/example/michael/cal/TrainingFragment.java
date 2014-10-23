@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ToggleButton;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 /**
  * Created by michael on 10/21/14.
@@ -22,7 +24,9 @@ public class TrainingFragment extends PlaceholderFragment {
     private ToggleButton mTakingDataButton;
     private ToggleButton mWalkButton;
 
+    private PowerManager.WakeLock mWakeLock;
     NthSense sensorService;
+
     boolean mBound = false;
 
     public static TrainingFragment newInstance(int sectionNumber) {
@@ -37,7 +41,6 @@ public class TrainingFragment extends PlaceholderFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_training, container, false);
-
 
         mTakingDataButton = (ToggleButton) rootView.findViewById(R.id.take_data1);
         mWalkButton = (ToggleButton) rootView.findViewById(R.id.walkingToggle1);
@@ -55,9 +58,20 @@ public class TrainingFragment extends PlaceholderFragment {
                 sensorService.set_is_walking(mWalkButton.isChecked());
             }
         });
+
+        PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake_lock");
+        Log.i("Tony", "WAKE_LOCK: AQUIRED");
+        mWakeLock.acquire();
+
         return rootView;
+    }
 
-
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.i("Tony", "WAKE_LOCK: RELEASED");
+        mWakeLock.release();
     }
 
     @Override
