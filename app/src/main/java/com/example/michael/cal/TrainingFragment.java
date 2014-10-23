@@ -61,8 +61,8 @@ public class TrainingFragment extends PlaceholderFragment {
 
         PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake_lock");
-        Log.i("Tony", "WAKE_LOCK: AQUIRED");
-        mWakeLock.acquire();
+       // Log.i("Tony", "WAKE_LOCK: AQUIRED");
+        //mWakeLock.acquire();
 
         return rootView;
     }
@@ -70,8 +70,8 @@ public class TrainingFragment extends PlaceholderFragment {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Log.i("Tony", "WAKE_LOCK: RELEASED");
-        mWakeLock.release();
+       // Log.i("Tony", "WAKE_LOCK: RELEASED");
+        //mWakeLock.release();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class TrainingFragment extends PlaceholderFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mBound){
-            getActivity().unbindService(mConnection);
+         //   getActivity().unbindService(mConnection);
             mBound = !mBound;
         }
     }
