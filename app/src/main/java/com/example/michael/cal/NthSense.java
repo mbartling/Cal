@@ -37,7 +37,6 @@ public class NthSense extends Service implements SensorEventListener {
     private float lux;
 
     private float epsilon = 0.0000001f;
-    CalSqlAdapter calSqlAdapter;
 
     private boolean isWalking, isTakingData;
 
@@ -61,8 +60,6 @@ public class NthSense extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
-
-        calSqlAdapter = new CalSqlAdapter(this);
     }
 
     @Override
@@ -91,7 +88,7 @@ public class NthSense extends Service implements SensorEventListener {
         int d_isTrainingData = (isTakingData) ? 1 : 0;
 
         long timestamp = System.currentTimeMillis();
-        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
+        CalSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
     }
 
     @Override
@@ -111,40 +108,13 @@ public class NthSense extends Service implements SensorEventListener {
         }
     }
 
-    public void submitData(){
-        //Submits localDatabase to server
-        CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
-        String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
-        Log.i("JSON Count", Integer.toString(json.split("\\}").length));
-        try {
-            //HttpResponse httpr =
-            new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert.php", json)).get();
-            //Log.i("HTTP:",Integer.toString(httpr.getStatusLine().getStatusCode()));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void set_is_walking(boolean is_walking) {
         this.isWalking = is_walking;
         Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
-        submitData();
     }
 
     public void set_is_takingData(boolean is_takingData) {
         this.isTakingData = is_takingData;
         Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
-        clearDatabase();
     }
-
-    public void clearDatabase(){
-        //Prints size of database (rows)
-        //clears local database
-        Log.i("DB SIZE", Integer.toString(calSqlAdapter.getDbSize()));
-        calSqlAdapter.delDbData();
-        Log.i("Deleted", "DB");
-    }
-
 }
