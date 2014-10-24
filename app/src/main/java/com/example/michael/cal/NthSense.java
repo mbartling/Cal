@@ -1,27 +1,17 @@
 package com.example.michael.cal;
 
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-
-import com.example.michael.cal.CalNetwork.PostData;
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
 import com.example.michael.cal.CalSQL.CalSQLObj;
-
-import org.apache.http.HttpResponse;
-
-import java.net.BindException;
-import java.util.concurrent.ExecutionException;
 
 public class NthSense extends Service implements SensorEventListener {
     private SensorManager mSensorManager;
@@ -35,18 +25,25 @@ public class NthSense extends Service implements SensorEventListener {
     private int proximityVal = 0;
     private float proxMax;
     private float lux;
+    CalSqlAdapter calSqlAdapter;
 
     private float epsilon = 0.0000001f;
 
     private boolean isWalking, isTakingData;
 
     public NthSense() {
-
+        Log.i("Grant","constructor");
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i("Grant","created");
+        calSqlAdapter = MainActivity.getAdapter();
+
+        if(calSqlAdapter==null)
+            calSqlAdapter = new CalSqlAdapter(this);
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -88,7 +85,7 @@ public class NthSense extends Service implements SensorEventListener {
         int d_isTrainingData = (isTakingData) ? 1 : 0;
 
         long timestamp = System.currentTimeMillis();
-        CalSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
+        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
     }
 
     @Override

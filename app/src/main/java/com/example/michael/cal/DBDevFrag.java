@@ -6,11 +6,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ToggleButton;
 
 /**
  * Created by Anthony on 10/24/2014.
@@ -32,9 +32,8 @@ public class DBDevFrag extends PlaceholderFragment{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_training, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_dbdev, container, false);
 
         mclearDbButton = (Button) rootView.findViewById(R.id.clearData);
         msendDbButton = (Button) rootView.findViewById(R.id.sendData);
@@ -42,14 +41,16 @@ public class DBDevFrag extends PlaceholderFragment{
         mclearDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sensorService.clearDatabase();
+                if(sensorService!=null)
+                    sensorService.clearDatabase();
             }
         });
 
         msendDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sensorService.submitData();
+                if(sensorService!=null)
+                    sensorService.submitData();
             }
         });
 
@@ -61,6 +62,7 @@ public class DBDevFrag extends PlaceholderFragment{
         super.onStart();
         Intent intent = new Intent(getActivity(), dataService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.i("Grant","start2");
     }
 
     public void onDestroy() { //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
@@ -79,6 +81,7 @@ public class DBDevFrag extends PlaceholderFragment{
         public void onServiceConnected(ComponentName className, IBinder service) {
             dataService.dataBinder binder = (dataService.dataBinder) service;
             sensorService = binder.getService();
+            Log.i("Grant","bind2");
         }
 
         @Override

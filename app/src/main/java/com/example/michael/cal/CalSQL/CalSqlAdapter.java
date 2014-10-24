@@ -19,10 +19,14 @@ import org.json.JSONObject;
  */
 public class CalSqlAdapter {
 
-//    static CalSqlHelper helper = new CalSqlHelper(CalSqlAdapter);
-    private static String GoogleAccountEmail;
+    CalSqlHelper helper;
+    private String GoogleAccountEmail;
 
-    public static String getGoogleAccountEmail() {
+    public CalSqlAdapter(Context context){
+        helper = new CalSqlHelper(context);
+    }
+
+    public String getGoogleAccountEmail() {
         if (GoogleAccountEmail == null) {
             //not sure if I should just save the context reference from this class itself
             AccountManager am = (AccountManager) helper.context.getSystemService(helper.context.ACCOUNT_SERVICE);
@@ -39,7 +43,7 @@ public class CalSqlAdapter {
         return GoogleAccountEmail;
     }
 
-    public static long insertData(CalSQLObj SQLObj) {
+    public long insertData(CalSQLObj SQLObj) {
 
         SQLiteDatabase db = helper.getWritableDatabase();
 
@@ -61,18 +65,18 @@ public class CalSqlAdapter {
         return id;
     }
 
-    public static int getDbSize() {
+    public int getDbSize() {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + CalSqlHelper.TABLE_NAME, null);
         c.moveToFirst();
         return c.getInt(0);
     }
 
-    public static void delDbData() {
+    public void delDbData() {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("DELETE FROM " + CalSqlHelper.TABLE_NAME);
     }
-    public static CalSQLObj getSingleData(long timestamp) {
+    public CalSQLObj getSingleData(long timestamp) {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.ENTRY_TIMESTAMP + "=" + timestamp + " LIMIT 1", null);
         if (c.moveToFirst()) { //if statement makes sure that cursor is not null
@@ -94,7 +98,7 @@ public class CalSqlAdapter {
     }
 
     //TODO: This function has not been tested, use with caution!
-    public static CalSQLObj[] getRangeData(long startTimestamp, long endTimestamp) {
+    public CalSQLObj[] getRangeData(long startTimestamp, long endTimestamp) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String[] selctionArgs={Long.toString(startTimestamp), Long.toString(endTimestamp)}; //This allows variables to be "fed" into the SQL query easier
         Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.ENTRY_TIMESTAMP +
@@ -126,7 +130,7 @@ public class CalSqlAdapter {
         }
     }
     //TODO: This function has not been tested, use with caution!
-    public static String createCSVString(CalSQLObj[] CalSQLObjArray) {
+    public String createCSVString(CalSQLObj[] CalSQLObjArray) {
         String outputString = "";
         for (CalSQLObj SQLObj : CalSQLObjArray) {
             //TODO: While this data should be all numberical, it is best practice to have a function to parse data and escape special characters such as commas
@@ -137,7 +141,7 @@ public class CalSqlAdapter {
         return outputString;
     }
 
-    public static JSONArray createJSONObjWithEmail(CalSQLObj[] CalSQLObjArray) {
+    public JSONArray createJSONObjWithEmail(CalSQLObj[] CalSQLObjArray) {
         JSONArray ja = new JSONArray();
         for (CalSQLObj SQLObj : CalSQLObjArray) {
             //Output format: email, timestamp, xVal, yVal, zVal, proxVal, luxVal, isWalking, isTraining

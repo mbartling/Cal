@@ -1,39 +1,33 @@
 package com.example.michael.cal;
 
 import android.app.Service;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.example.michael.cal.CalNetwork.PostData;
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
 import com.example.michael.cal.CalSQL.CalSQLObj;
-
-import org.apache.http.HttpResponse;
-
-import java.net.BindException;
 import java.util.concurrent.ExecutionException;
 
 public class dataService extends Service implements SensorEventListener {
-
     private IBinder mBinder = new dataBinder();
+    CalSqlAdapter calSqlAdapter;
 
     public dataService() {
-
+        Log.i("Grant","constructor2");
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i("Grant","created2");
+        calSqlAdapter = MainActivity.getAdapter();
+        if(calSqlAdapter==null)
+            calSqlAdapter = new CalSqlAdapter(this);
     }
 
     @Override
@@ -51,7 +45,7 @@ public class dataService extends Service implements SensorEventListener {
 
     }
 
-    class dataBinder extends Binder {
+    public class dataBinder extends Binder {
         dataService getService() {
             return dataService.this;
         }
@@ -59,8 +53,8 @@ public class dataService extends Service implements SensorEventListener {
 
     public void submitData(){
         //Submits localDatabase to server
-        CalSQLObj[] cso = CalSqlAdapter.getRangeData(0, System.currentTimeMillis());
-        String json = CalSqlAdapter.createJSONObjWithEmail(cso).toString();
+        CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
+        String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
         Log.i("JSON Count", Integer.toString(json.split("\\}").length));
         try {
             //HttpResponse httpr =
@@ -76,8 +70,8 @@ public class dataService extends Service implements SensorEventListener {
     public void clearDatabase(){
         //Prints size of database (rows)
         //clears local database
-        Log.i("DB SIZE", Integer.toString(CalSqlAdapter.getDbSize()));
-        CalSqlAdapter.delDbData();
+        Log.i("DB SIZE", Integer.toString(calSqlAdapter.getDbSize()));
+        calSqlAdapter.delDbData();
         Log.i("Deleted", "DB");
     }
 

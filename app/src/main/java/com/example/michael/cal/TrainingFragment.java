@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import android.os.IBinder;
  * Created by michael on 10/21/14.
  */
 public class TrainingFragment extends PlaceholderFragment {
-
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private ToggleButton mTakingDataButton;
@@ -32,8 +32,7 @@ public class TrainingFragment extends PlaceholderFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_training, container, false);
 
         mTakingDataButton = (ToggleButton) rootView.findViewById(R.id.take_data1);
@@ -61,6 +60,7 @@ public class TrainingFragment extends PlaceholderFragment {
         super.onStart();
         Intent intent = new Intent(getActivity(), NthSense.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.i("Grant","start1");
     }
 
     public void onDestroy() { //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
@@ -79,6 +79,7 @@ public class TrainingFragment extends PlaceholderFragment {
         public void onServiceConnected(ComponentName className, IBinder service) {
             NthSense.NthBinder binder = (NthSense.NthBinder) service;
             sensorService = binder.getService();
+            Log.i("Grant","bind");
         }
 
         @Override
