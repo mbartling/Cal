@@ -92,12 +92,14 @@ public class MainActivity extends Activity
         if (!fromSavedInstanceState) {
             FragmentManager fragmentManager = getFragmentManager();
             if (position == 0) {
-
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, TrainingFragment.newInstance(position + 1))
                         .commit();
-
-            } else if (position == 4) {
+            } /*else if (position == 1) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, DBDevFrag.newInstance(position + 1))
+                        .commit();
+            } */else if (position == 4) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))
                         .commit();
