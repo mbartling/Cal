@@ -9,14 +9,19 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.michael.cal.CalNetwork.PostData;
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
 import com.example.michael.cal.CalSQL.CalSQLObj;
 
+import org.apache.http.HttpResponse;
+
 import java.net.BindException;
+import java.util.concurrent.ExecutionException;
 
 public class NthSense extends Service implements SensorEventListener {
     private SensorManager mSensorManager;
@@ -95,12 +100,13 @@ public class NthSense extends Service implements SensorEventListener {
         long timestamp = System.currentTimeMillis();
         calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into db
 
-        CalSQLObj so = calSqlAdapter.getSingleData(timestamp); //Read data from the db using the recently entered timestamp as identifier and print out information using the log command below.
+
+
+        //Below is the logging command
+        /*CalSQLObj so = calSqlAdapter.getSingleData(timestamp); //Read data from the db using the recently entered timestamp as identifier and print out information using the log command below.
         Log.i("db data", "timeStamp: " + so.getTimestamp() + ", xVal: " + so.getxVal() + ", yVal: " + so.getyVal() + ", zVal: " + so.getzVal() +
         ", proxVal: " + so.getProxVal() + ", lxuVal: " + so.getLuxVal() + ", isWalking: " + so.getIsWalking() + ", isTraining: " + so.getIsTraining());
-
-        //Below is the old logging command
-        //Log.i("Grant", "DATABASE OUTPUT: " + calSqlAdapter.pullTestData(timeStamp) + "; should be " + x);
+        */
     }
 
     @Override
@@ -126,10 +132,31 @@ public class NthSense extends Service implements SensorEventListener {
     {
         this.isWalking = is_walking;
         Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
+
+
+
+        //This is just test code.
+        CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
+        String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
+        Log.i("JSON Count", Integer.toString(json.split("\\}").length));
+        try {
+            //HttpResponse httpr =
+            new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert.php", json)).get();
+            //Log.i("HTTP:",Integer.toString(httpr.getStatusLine().getStatusCode()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
     public void set_is_takingData(boolean is_takingData)
     {
         this.isTakingData = is_takingData;
         Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
+
+        //This is just test code
+        Log.i("DB SIZE", Integer.toString(calSqlAdapter.getDbSize()));
+        calSqlAdapter.delDbData();
+        Log.i("Deleted", "DB");
     }
 }

@@ -10,6 +10,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by michael on 10/19/14.
  */
@@ -61,6 +65,17 @@ public class CalSqlAdapter {
         return id;
     }
 
+    public int getDbSize() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + CalSqlHelper.TABLE_NAME, null);
+        c.moveToFirst();
+        return c.getInt(0);
+    }
+
+    public void delDbData() {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + CalSqlHelper.TABLE_NAME);
+    }
     public CalSQLObj getSingleData(long timestamp) {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.ENTRY_TIMESTAMP + "=" + timestamp + " LIMIT 1", null);
@@ -124,6 +139,30 @@ public class CalSqlAdapter {
                     ", " + SQLObj.getProxVal() + ", " + SQLObj.getLuxVal() + ", " + SQLObj.getIsWalking() + ", " + SQLObj.getIsTraining() + "/n";
         }
         return outputString;
+    }
+
+    public JSONArray createJSONObjWithEmail(CalSQLObj[] CalSQLObjArray) {
+        JSONArray ja = new JSONArray();
+        for (CalSQLObj SQLObj : CalSQLObjArray) {
+            //Output format: email, timestamp, xVal, yVal, zVal, proxVal, luxVal, isWalking, isTraining
+
+            JSONObject jo = new JSONObject();
+            try {
+            jo.put("email", getGoogleAccountEmail());
+            jo.put("timestamp", SQLObj.getTimestamp());
+            jo.put("xVal", SQLObj.getxVal());
+            jo.put("yVal", SQLObj.getyVal());
+            jo.put("zVal", SQLObj.getzVal());
+            jo.put("luxVal", SQLObj.getLuxVal());
+            jo.put("proxVal", SQLObj.getProxVal());
+            jo.put("isWalking", SQLObj.getIsWalking());
+            jo.put("isTraining", SQLObj.getIsTraining());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ja.put(jo);
+        }
+        return ja;
     }
 
 
