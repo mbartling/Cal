@@ -42,6 +42,7 @@ public class NthSense extends Service implements SensorEventListener {
     private boolean isWalking, isTakingData;
 
     public NthSense() {
+
     }
 
     @Override
@@ -62,21 +63,15 @@ public class NthSense extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
 
         calSqlAdapter = new CalSqlAdapter(this);
-
-
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        //throw new UnsupportedOperationException("Not yet implemented");\
         return mBinder;
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-
-        //long timeStamp = sensorEvent.timestamp;
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 0 : 1;
         }
@@ -91,22 +86,12 @@ public class NthSense extends Service implements SensorEventListener {
         float y = accelVals[1];
         float z = accelVals[2];
 
-        //Will Bind the service giving us the ability to set isWalking and isTakingData
+        //converts boolean to 1 or 0 for storage in database
         int d_isWalking = (isWalking) ? 1 : 0;
         int d_isTrainingData = (isTakingData) ? 1 : 0;
-        //String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
-
 
         long timestamp = System.currentTimeMillis();
-        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into db
-
-
-
-        //Below is the logging command
-        /*CalSQLObj so = calSqlAdapter.getSingleData(timestamp); //Read data from the db using the recently entered timestamp as identifier and print out information using the log command below.
-        Log.i("db data", "timeStamp: " + so.getTimestamp() + ", xVal: " + so.getxVal() + ", yVal: " + so.getyVal() + ", zVal: " + so.getzVal() +
-        ", proxVal: " + so.getProxVal() + ", lxuVal: " + so.getLuxVal() + ", isWalking: " + so.getIsWalking() + ", isTraining: " + so.getIsTraining());
-        */
+        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
     }
 
     @Override
@@ -118,9 +103,7 @@ public class NthSense extends Service implements SensorEventListener {
     public void onDestroy() {
         super.onDestroy();
         mSensorManager.unregisterListener(this);
-
     }
-
 
     public class NthBinder extends Binder {
         NthSense getService() {
@@ -128,14 +111,8 @@ public class NthSense extends Service implements SensorEventListener {
         }
     }
 
-    public void set_is_walking(boolean is_walking)
-    {
-        this.isWalking = is_walking;
-        Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
-
-
-
-        //This is just test code.
+    public void submitData(){
+        //Submits localDatabase to server
         CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
         String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
         Log.i("JSON Count", Integer.toString(json.split("\\}").length));
@@ -149,14 +126,25 @@ public class NthSense extends Service implements SensorEventListener {
             e.printStackTrace();
         }
     }
-    public void set_is_takingData(boolean is_takingData)
-    {
+
+    public void set_is_walking(boolean is_walking) {
+        this.isWalking = is_walking;
+        Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
+        submitData();
+    }
+
+    public void set_is_takingData(boolean is_takingData) {
         this.isTakingData = is_takingData;
         Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
+        clearDatabase();
+    }
 
-        //This is just test code
+    public void clearDatabase(){
+        //Prints size of database (rows)
+        //clears local database
         Log.i("DB SIZE", Integer.toString(calSqlAdapter.getDbSize()));
         calSqlAdapter.delDbData();
         Log.i("Deleted", "DB");
     }
+
 }
