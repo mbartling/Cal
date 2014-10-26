@@ -1,27 +1,17 @@
 package com.example.michael.cal;
 
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-
-import com.example.michael.cal.CalNetwork.PostData;
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
 import com.example.michael.cal.CalSQL.CalSQLObj;
-
-import org.apache.http.HttpResponse;
-
-import java.net.BindException;
-import java.util.concurrent.ExecutionException;
 
 public class NthSense extends Service implements SensorEventListener {
     private SensorManager mSensorManager;
@@ -35,9 +25,9 @@ public class NthSense extends Service implements SensorEventListener {
     private int proximityVal = 0;
     private float proxMax;
     private float lux;
+    CalSqlAdapter calSqlAdapter;
 
     private float epsilon = 0.0000001f;
-    CalSqlAdapter calSqlAdapter;
 
     private boolean isWalking, isTakingData;
 
@@ -48,6 +38,11 @@ public class NthSense extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        calSqlAdapter = MainActivity.getAdapter();
+
+        if(calSqlAdapter==null)
+            calSqlAdapter = new CalSqlAdapter(this);
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -61,8 +56,6 @@ public class NthSense extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
-
-        calSqlAdapter = new CalSqlAdapter(this);
     }
 
     @Override
@@ -111,40 +104,13 @@ public class NthSense extends Service implements SensorEventListener {
         }
     }
 
-    public void submitData(){
-        //Submits localDatabase to server
-        CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
-        String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
-        Log.i("JSON Count", Integer.toString(json.split("\\}").length));
-        try {
-            //HttpResponse httpr =
-            new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert.php", json)).get();
-            //Log.i("HTTP:",Integer.toString(httpr.getStatusLine().getStatusCode()));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void set_is_walking(boolean is_walking) {
         this.isWalking = is_walking;
         Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
-        submitData();
     }
 
     public void set_is_takingData(boolean is_takingData) {
         this.isTakingData = is_takingData;
         Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
-        clearDatabase();
     }
-
-    public void clearDatabase(){
-        //Prints size of database (rows)
-        //clears local database
-        Log.i("DB SIZE", Integer.toString(calSqlAdapter.getDbSize()));
-        calSqlAdapter.delDbData();
-        Log.i("Deleted", "DB");
-    }
-
 }

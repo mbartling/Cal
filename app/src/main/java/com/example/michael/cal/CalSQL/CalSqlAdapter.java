@@ -22,6 +22,10 @@ public class CalSqlAdapter {
     CalSqlHelper helper;
     private String GoogleAccountEmail;
 
+    public CalSqlAdapter(Context context){
+        helper = new CalSqlHelper(context);
+    }
+
     public String getGoogleAccountEmail() {
         if (GoogleAccountEmail == null) {
             //not sure if I should just save the context reference from this class itself
@@ -31,16 +35,12 @@ public class CalSqlAdapter {
                 //apparently, the "main" account on the device will be returned first in this list
                 if (a.type.equals("com.google")) {
                     //Not really sure whether this pulls an email address or not. TO FIX LATER IF NECESSARY.
-                    this.GoogleAccountEmail = a.name;
+                    GoogleAccountEmail = a.name;
                 }
             }
             return null;
         }
         return GoogleAccountEmail;
-    }
-
-    public CalSqlAdapter(Context context) {
-        helper = new CalSqlHelper(context);
     }
 
     public long insertData(CalSQLObj SQLObj) {
@@ -164,15 +164,6 @@ public class CalSqlAdapter {
         }
         return ja;
     }
-
-
-    //This is the old pull function
-    /*public String pullTestData(long timestamp) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.ENTRY_TIMESTAMP + "=" + timestamp, null);
-        c.moveToFirst();
-        return c.getString(1) + "; TAKING DATA: " + Integer.toString(c.getInt(7)) + "; ACCT: " + getGoogleAccountEmail();
-    }*/
 
     static class CalSqlHelper extends SQLiteOpenHelper {
 
