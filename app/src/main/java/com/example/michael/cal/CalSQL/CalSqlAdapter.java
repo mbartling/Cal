@@ -36,6 +36,7 @@ public class CalSqlAdapter {
                 if (a.type.equals("com.google")) {
                     //Not really sure whether this pulls an email address or not. TO FIX LATER IF NECESSARY.
                     GoogleAccountEmail = a.name;
+                    return GoogleAccountEmail;
                 }
             }
             return null;
@@ -68,13 +69,19 @@ public class CalSqlAdapter {
     public int getDbSize() {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + CalSqlHelper.TABLE_NAME, null);
-        c.moveToFirst();
-        return c.getInt(0);
+        int size = -1;
+        if (c.moveToFirst()) {
+            size = c.getInt(0);
+        }
+        c.close();
+        return size;
     }
 
     public void delDbData() {
         SQLiteDatabase db = helper.getWritableDatabase();
+        Log.d("Deleting DB", "Size:" + Integer.toString(getDbSize()));
         db.execSQL("DELETE FROM " + CalSqlHelper.TABLE_NAME);
+        db.close();
     }
     public CalSQLObj getSingleData(long timestamp) {
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -89,22 +96,21 @@ public class CalSqlAdapter {
             int luxValCol = c.getColumnIndex(CalSqlHelper.ENTRY_LUXVAL);
             int isWalkingCol = c.getColumnIndex(CalSqlHelper.ENTRY_ISWALKING);
             int isTrainingCol = c.getColumnIndex(CalSqlHelper.ENTRY_ISTRAINING);
-            db.close();
-            return new CalSQLObj(c.getFloat(xValCol),c.getFloat(yValCol),c.getFloat(zValCol),
+            CalSQLObj so = new CalSQLObj(c.getFloat(xValCol),c.getFloat(yValCol),c.getFloat(zValCol),
                     c.getFloat(proxValCol),c.getFloat(luxValCol),c.getInt(isWalkingCol),c.getInt(isTrainingCol),c.getLong(timestampCol));
+            c.close();
+            return so;
         }
-        db.close();
         return null;
     }
 
-    //TODO: This function has not been tested, use with caution!
     public CalSQLObj[] getRangeData(long startTimestamp, long endTimestamp) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String[] selctionArgs={Long.toString(startTimestamp), Long.toString(endTimestamp)}; //This allows variables to be "fed" into the SQL query easier
         Cursor c = db.rawQuery("SELECT * FROM " + CalSqlHelper.TABLE_NAME + " WHERE " + CalSqlHelper.ENTRY_TIMESTAMP +
                 " BETWEEN ? AND ?", selctionArgs); //Insert ? where you want each value of selctionArgs to be inserted
         if (c.getCount() == 0) { //Select statement did not return any results
-            db.close();
+            c.close();
             return null;
         }
         else { //Select statement has results
@@ -125,7 +131,7 @@ public class CalSqlAdapter {
                     returnArray[arrayIndex] = SQLObj;
                 }
             }
-            db.close();
+            c.close();
             return returnArray;
         }
     }
@@ -143,24 +149,26 @@ public class CalSqlAdapter {
 
     public JSONArray createJSONObjWithEmail(CalSQLObj[] CalSQLObjArray) {
         JSONArray ja = new JSONArray();
-        for (CalSQLObj SQLObj : CalSQLObjArray) {
-            //Output format: email, timestamp, xVal, yVal, zVal, proxVal, luxVal, isWalking, isTraining
+        if (CalSQLObjArray != null) {
+            for (CalSQLObj SQLObj : CalSQLObjArray) {
+                //Output format: email, timestamp, xVal, yVal, zVal, proxVal, luxVal, isWalking, isTraining
 
-            JSONObject jo = new JSONObject();
-            try {
-            jo.put("email", getGoogleAccountEmail());
-            jo.put("timestamp", SQLObj.getTimestamp());
-            jo.put("xVal", SQLObj.getxVal());
-            jo.put("yVal", SQLObj.getyVal());
-            jo.put("zVal", SQLObj.getzVal());
-            jo.put("luxVal", SQLObj.getLuxVal());
-            jo.put("proxVal", SQLObj.getProxVal());
-            jo.put("isWalking", SQLObj.getIsWalking());
-            jo.put("isTraining", SQLObj.getIsTraining());
-            } catch (JSONException e) {
-                e.printStackTrace();
+                JSONObject jo = new JSONObject();
+                try {
+                    jo.put("email", getGoogleAccountEmail());
+                    jo.put("timestamp", SQLObj.getTimestamp());
+                    jo.put("xVal", SQLObj.getxVal());
+                    jo.put("yVal", SQLObj.getyVal());
+                    jo.put("zVal", SQLObj.getzVal());
+                    jo.put("luxVal", SQLObj.getLuxVal());
+                    jo.put("proxVal", SQLObj.getProxVal());
+                    jo.put("isWalking", SQLObj.getIsWalking());
+                    jo.put("isTraining", SQLObj.getIsTraining());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                ja.put(jo);
             }
-            ja.put(jo);
         }
         return ja;
     }
@@ -169,14 +177,13 @@ public class CalSqlAdapter {
 
         private static final String DATABASE_NAME = "cal.db";
         private static final String TABLE_NAME = "NthSense";
-        private static final String ENTRY_TIMESTAMP = "timestamp";
 
+        private static final String ENTRY_TIMESTAMP = "timestamp";
         private static final String ENTRY_XVAL = "xVal";
         private static final String ENTRY_YVAL = "yVal";
         private static final String ENTRY_ZVAL = "zVal";
         private static final String ENTRY_PROXVAL = "proxVal";
         private static final String ENTRY_LUXVAL = "luxVal";
-
         private static final String ENTRY_ISWALKING = "isWalking";
         private static final String ENTRY_ISTRAINING = "isTraining";
 
@@ -191,22 +198,18 @@ public class CalSqlAdapter {
                 ENTRY_ISWALKING + " INTEGER, " +
                 ENTRY_ISTRAINING + " INTEGER " +
                 ");";
-        private static final String DROP_TABLE = "DROP TABLE IF EXISTS" + TABLE_NAME;
-
+        private static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
         private static final int DATABASE_VERSION = 2;
 
         private Context context;
 
         public CalSqlHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
             this.context = context;
         }
 
         @Override
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
-            //CREATE TABLE NthSense (_id INTEGER PRIMARY KEY, ...);
             try {
                 sqLiteDatabase.execSQL(CREATE_TABLE);
             } catch (SQLException e) {
@@ -217,7 +220,6 @@ public class CalSqlAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-
             try {
                 sqLiteDatabase.execSQL(DROP_TABLE);
 
@@ -225,8 +227,6 @@ public class CalSqlAdapter {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-
         }
     }
 }
