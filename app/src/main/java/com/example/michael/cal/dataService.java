@@ -52,6 +52,7 @@ public class dataService extends Service implements SensorEventListener {
     }
 
     public void submitData(){
+        /*
         //Submits localDatabase to server
         CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
         String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
@@ -65,6 +66,7 @@ public class dataService extends Service implements SensorEventListener {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+        */
     }
 
     public void clearDatabase(){
