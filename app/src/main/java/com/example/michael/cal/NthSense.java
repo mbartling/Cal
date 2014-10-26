@@ -32,13 +32,12 @@ public class NthSense extends Service implements SensorEventListener {
     private boolean isWalking, isTakingData;
 
     public NthSense() {
-        Log.i("Grant","constructor");
+
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("Grant","created");
         calSqlAdapter = MainActivity.getAdapter();
 
         if(calSqlAdapter==null)

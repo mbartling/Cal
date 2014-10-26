@@ -60,7 +60,6 @@ public class TrainingFragment extends PlaceholderFragment {
         super.onStart();
         Intent intent = new Intent(getActivity(), NthSense.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        Log.i("Grant","start1");
     }
 
     public void onDestroy() { //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
@@ -79,7 +78,6 @@ public class TrainingFragment extends PlaceholderFragment {
         public void onServiceConnected(ComponentName className, IBinder service) {
             NthSense.NthBinder binder = (NthSense.NthBinder) service;
             sensorService = binder.getService();
-            Log.i("Grant","bind");
         }
 
         @Override

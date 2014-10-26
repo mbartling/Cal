@@ -18,13 +18,11 @@ public class dataService extends Service implements SensorEventListener {
     CalSqlAdapter calSqlAdapter;
 
     public dataService() {
-        Log.i("Grant","constructor2");
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("Grant","created2");
         calSqlAdapter = MainActivity.getAdapter();
         if(calSqlAdapter==null)
             calSqlAdapter = new CalSqlAdapter(this);
@@ -52,6 +50,7 @@ public class dataService extends Service implements SensorEventListener {
     }
 
     public void submitData(){
+        Log.i("DataBase", "Should push local DB to remote here");
         /*
         //Submits localDatabase to server
         CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
@@ -72,9 +71,9 @@ public class dataService extends Service implements SensorEventListener {
     public void clearDatabase(){
         //Prints size of database (rows)
         //clears local database
-        Log.i("DB SIZE", Integer.toString(calSqlAdapter.getDbSize()));
+        Log.i("DataBase", "SIZE "+ Integer.toString(calSqlAdapter.getDbSize()));
         calSqlAdapter.delDbData();
-        Log.i("Deleted", "DB");
+        Log.i("DataBase", "Deleted");
     }
 
 }

@@ -41,16 +41,14 @@ public class DBDevFrag extends PlaceholderFragment{
         mclearDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(sensorService!=null)
-                    sensorService.clearDatabase();
+                sensorService.clearDatabase();
             }
         });
 
         msendDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(sensorService!=null)
-                    sensorService.submitData();
+                sensorService.submitData();
             }
         });
 
@@ -62,7 +60,6 @@ public class DBDevFrag extends PlaceholderFragment{
         super.onStart();
         Intent intent = new Intent(getActivity(), dataService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        Log.i("Grant","start2");
     }
 
     public void onDestroy() { //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
@@ -81,7 +78,6 @@ public class DBDevFrag extends PlaceholderFragment{
         public void onServiceConnected(ComponentName className, IBinder service) {
             dataService.dataBinder binder = (dataService.dataBinder) service;
             sensorService = binder.getService();
-            Log.i("Grant","bind2");
         }
 
         @Override
