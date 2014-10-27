@@ -24,7 +24,7 @@ public class dataService extends Service {
         super.onCreate();
         calSqlAdapter = MainActivity.getAdapter();
         if(calSqlAdapter==null)
-            calSqlAdapter = new CalSqlAdapter(this);
+            calSqlAdapter = MainActivity.setAdapter(new CalSqlAdapter(this));
     }
 
     @Override
@@ -65,7 +65,9 @@ public class dataService extends Service {
     public void clearDatabase(){
         //Prints size of database (rows)
         //clears local database
+        Log.i("DataBase", "SIZE "+ Integer.toString(calSqlAdapter.getDbSize()));
         calSqlAdapter.delDbData();
+        Log.i("DataBase", "Deleted");
     }
 
 }

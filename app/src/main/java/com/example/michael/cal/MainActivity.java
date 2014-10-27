@@ -43,6 +43,10 @@ public class MainActivity extends Activity
         return calSqlAdapter;
     }
 
+    public static CalSqlAdapter setAdapter(CalSqlAdapter c){
+       return calSqlAdapter = c;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
