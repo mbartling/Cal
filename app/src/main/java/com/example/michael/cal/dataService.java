@@ -42,7 +42,7 @@ public class dataService extends Service {
         //Submits localDatabase to server
         CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
         String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
-        Log.i("DataBase", "Attempting to send "Integer.toString(json.split("\\}").length - 1)" entries");
+        Log.i("DataBase", "Attempting to send "+Integer.toString(json.split("\\}").length - 1)+" entries");
         try {
             HttpResponse httpr = new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert.php", json)).get();
             if (httpr != null) {
