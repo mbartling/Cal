@@ -1,10 +1,8 @@
 package com.example.michael.cal;
 
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,11 +10,8 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
 import com.example.michael.cal.CalSQL.CalSQLObj;
-
-import java.net.BindException;
 
 public class NthSense extends Service implements SensorEventListener {
     private SensorManager mSensorManager;
@@ -30,9 +25,9 @@ public class NthSense extends Service implements SensorEventListener {
     private int proximityVal = 0;
     private float proxMax;
     private float lux;
+    CalSqlAdapter calSqlAdapter;
 
     private float epsilon = 0.0000001f;
-    CalSqlAdapter calSqlAdapter;
 
     private boolean isWalking, isTakingData;
 
@@ -43,6 +38,11 @@ public class NthSense extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        calSqlAdapter = MainActivity.getAdapter();
+
+        if(calSqlAdapter==null)
+            calSqlAdapter = new CalSqlAdapter(this);
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -56,20 +56,15 @@ public class NthSense extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
-
-        calSqlAdapter = new CalSqlAdapter(this);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        //throw new UnsupportedOperationException("Not yet implemented");\
         return mBinder;
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        //long timeStamp = sensorEvent.timestamp;
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             proximityVal = (Math.abs(sensorEvent.values[0] - proxMax) < epsilon) ? 0 : 1;
         }
@@ -84,20 +79,12 @@ public class NthSense extends Service implements SensorEventListener {
         float y = accelVals[1];
         float z = accelVals[2];
 
-        //Will Bind the service giving us the ability to set isWalking and isTakingData
+        //converts boolean to 1 or 0 for storage in database
         int d_isWalking = (isWalking) ? 1 : 0;
         int d_isTrainingData = (isTakingData) ? 1 : 0;
-        //String s = String.format("%f, %f, %f, %d, %d, %d;\n", x, y, z, proximityVal, d_isWalking, d_isTakingData);
 
         long timestamp = System.currentTimeMillis();
-        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into db
-
-        CalSQLObj so = calSqlAdapter.getSingleData(timestamp); //Read data from the db using the recently entered timestamp as identifier and print out information using the log command below.
-        Log.i("db data", "timeStamp: " + so.getTimestamp() + ", xVal: " + so.getxVal() + ", yVal: " + so.getyVal() + ", zVal: " + so.getzVal() +
-        ", proxVal: " + so.getProxVal() + ", lxuVal: " + so.getLuxVal() + ", isWalking: " + so.getIsWalking() + ", isTraining: " + so.getIsTraining());
-
-        //Below is the old logging command
-        //Log.i("Grant", "DATABASE OUTPUT: " + calSqlAdapter.pullTestData(timeStamp) + "; should be " + x);
+        calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
     }
 
     @Override
@@ -117,13 +104,12 @@ public class NthSense extends Service implements SensorEventListener {
         }
     }
 
-    public void set_is_walking(boolean is_walking)
-    {
+    public void set_is_walking(boolean is_walking) {
         this.isWalking = is_walking;
         Log.i("NthSense", "Setting is Walking " + String.valueOf(this.isWalking));
     }
-    public void set_is_takingData(boolean is_takingData)
-    {
+
+    public void set_is_takingData(boolean is_takingData) {
         this.isTakingData = is_takingData;
         Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
     }

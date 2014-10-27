@@ -23,6 +23,7 @@ public class MainActivity extends Activity
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
+    private static CalSqlAdapter calSqlAdapter;
 
     private int currPosition;
     private boolean isTakingData, isWalking;
@@ -37,6 +38,10 @@ public class MainActivity extends Activity
      */
     private CharSequence mTitle;
     //CalSqlAdapter calSqlAdapter;
+
+    public static CalSqlAdapter getAdapter(){
+        return calSqlAdapter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,11 +97,13 @@ public class MainActivity extends Activity
         if (!fromSavedInstanceState) {
             FragmentManager fragmentManager = getFragmentManager();
             if (position == 0) {
-
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, TrainingFragment.newInstance(position + 1))
                         .commit();
-
+            } else if (position == 1) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, DBDevFrag.newInstance(position + 1))
+                        .commit();
             } else if (position == 4) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))

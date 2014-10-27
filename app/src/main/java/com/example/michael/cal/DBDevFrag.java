@@ -5,26 +5,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ToggleButton;
-import android.os.IBinder;
+import android.widget.Button;
 
 /**
- * Created by michael on 10/21/14.
+ * Created by Anthony on 10/24/2014.
  */
-public class TrainingFragment extends PlaceholderFragment {
+public class DBDevFrag extends PlaceholderFragment{
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private ToggleButton mTakingDataButton;
-    private ToggleButton mWalkButton;
+    private Button mclearDbButton;
+    private Button msendDbButton;
 
-    NthSense sensorService;
+    dataService sensorService;
 
-    public static TrainingFragment newInstance(int sectionNumber) {
-        TrainingFragment fragment = new TrainingFragment();
+    public static DBDevFrag newInstance(int sectionNumber) {
+        DBDevFrag fragment = new DBDevFrag();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
@@ -33,22 +33,22 @@ public class TrainingFragment extends PlaceholderFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_training, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_dbdev, container, false);
 
-        mTakingDataButton = (ToggleButton) rootView.findViewById(R.id.take_data1);
-        mWalkButton = (ToggleButton) rootView.findViewById(R.id.walkingToggle1);
+        mclearDbButton = (Button) rootView.findViewById(R.id.clearData);
+        msendDbButton = (Button) rootView.findViewById(R.id.sendData);
 
-        mTakingDataButton.setOnClickListener(new View.OnClickListener() {
+        mclearDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sensorService.set_is_takingData(mTakingDataButton.isChecked());
+                sensorService.clearDatabase();
             }
         });
 
-        mWalkButton.setOnClickListener(new View.OnClickListener() {
+        msendDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sensorService.set_is_walking(mWalkButton.isChecked());
+                sensorService.submitData();
             }
         });
 
@@ -58,7 +58,7 @@ public class TrainingFragment extends PlaceholderFragment {
     @Override
     public void onStart() {
         super.onStart();
-        Intent intent = new Intent(getActivity(), NthSense.class);
+        Intent intent = new Intent(getActivity(), dataService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -76,7 +76,7 @@ public class TrainingFragment extends PlaceholderFragment {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            NthSense.NthBinder binder = (NthSense.NthBinder) service;
+            dataService.dataBinder binder = (dataService.dataBinder) service;
             sensorService = binder.getService();
         }
 
