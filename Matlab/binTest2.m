@@ -1,5 +1,5 @@
 binSize = 32;
-
+clear frameDat
 frameDat.xVal = buffer(mDat.xVal, binSize);
 frameDat.yVal = buffer(mDat.yVal, binSize);
 frameDat.zVal = buffer(mDat.zVal, binSize);
@@ -26,7 +26,8 @@ end
 figure;
 [s1, s2] = size(frameDat.gmP);
 numPlots = 2 + s2;
-subplot(numPlots,1,1); plot(mDat.xVal); title('xVal'); axis([0 numel(mDat.xVal) min(mDat.xVal)*1.1 max(mDat.xVal)*1.1]);
+subplot(numPlots,1,1); plot(mDat.xVal); title('xVal'); 
+axis([0 numel(mDat.xVal) min(mDat.xVal)*1.1 max(mDat.xVal)*1.1]);
 subplot(numPlots,1,2); stem(1:binSize:length(frameDat.gmCluster)*binSize, frameDat.gmCluster-1); title('Clusters');
 axis([0 numel(mDat.xVal) 0 2]);
 

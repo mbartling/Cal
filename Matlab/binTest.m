@@ -1,5 +1,5 @@
 binSize = 32;
-
+clear frameDat
 frameDat.xVal = buffer(mDat.xVal, binSize);
 frameDat.yVal = buffer(mDat.yVal, binSize);
 frameDat.zVal = buffer(mDat.zVal, binSize);
@@ -25,7 +25,7 @@ for i = 1:s2
 end
 
 options = statset('Display','final');
-gm = gmdistribution.fit([frameDat.pwr(:,1) frameDat.pwr(:,2) frameDat.pwr(:,3)], 2, 'Options',options);
+gm = gmdistribution.fit([frameDat.pwr(:,1) frameDat.pwr(:,2) frameDat.pwr(:,3)], 3, 'Options',options);
 
 % Simulate live run
 for i = 1:s2
@@ -54,9 +54,12 @@ figure;
 numPlots = 2 + s2;
 subplot(numPlots,1,1); plot(mDat.xVal); title('xVal'); axis([0 numel(mDat.xVal) min(mDat.xVal)*1.1 max(mDat.xVal)*1.1]);
 subplot(numPlots,1,2); stem(1:binSize:length(frameDat.gmCluster)*binSize, frameDat.gmCluster-1); title('Clusters');
+axis([0 numel(mDat.xVal) 0 2]);
 
 
 for i = 1:s2
     subplot(numPlots,1,i+2); stem(1:binSize:length(frameDat.gmCluster)*binSize, frameDat.gmP(:,i)); title(strcat('Posterior Probability Cluster_', int2str(i)))
+    axis([0 numel(mDat.xVal) 0 2]);
+
 end
 %subplot(4,1,4); stem(1:binSize:length(frameDat.gmCluster)*binSize, frameDat.gmP(:,2));
