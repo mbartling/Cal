@@ -79,7 +79,6 @@ public class CalSqlAdapter {
 
     public void delDbData() {
         SQLiteDatabase db = helper.getWritableDatabase();
-        Log.d("Deleting DB", "Size:" + Integer.toString(getDbSize()));
         db.execSQL("DELETE FROM " + CalSqlHelper.TABLE_NAME);
         db.close();
     }

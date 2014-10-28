@@ -24,7 +24,7 @@ public class dataService extends Service {
         super.onCreate();
         calSqlAdapter = MainActivity.getAdapter();
         if(calSqlAdapter==null)
-            calSqlAdapter = new CalSqlAdapter(this);
+            calSqlAdapter = MainActivity.setAdapter(new CalSqlAdapter(this));
     }
 
     @Override
@@ -42,18 +42,19 @@ public class dataService extends Service {
         //Submits localDatabase to server
         CalSQLObj[] cso = calSqlAdapter.getRangeData(0, System.currentTimeMillis());
         String json = calSqlAdapter.createJSONObjWithEmail(cso).toString();
-        Log.i("Pushing to remote SQL Server. JSON Count", Integer.toString(json.split("\\}").length - 1));
+        Log.i("DataBase", "Attempting to send "+Integer.toString(json.split("\\}").length - 1)+" entries");
         try {
             HttpResponse httpr = new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert.php", json)).get();
             if (httpr != null) {
                 if (httpr.getStatusLine().getStatusCode() == 200) {
                     //Request successful
-                    calSqlAdapter.delDbData();
+                    Log.i("DataBase:", "Success");
+                    clearDatabase();
                     return;
                 }
             }
             //Request failed
-            Log.i("HTTP:", "There was a problem with this HTTP requst.");
+            Log.i("DataBase:", "There was a problem with this HTTP requst.");
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -65,7 +66,9 @@ public class dataService extends Service {
     public void clearDatabase(){
         //Prints size of database (rows)
         //clears local database
+        Log.i("DataBase", "SIZE "+ Integer.toString(calSqlAdapter.getDbSize()));
         calSqlAdapter.delDbData();
+        Log.i("DataBase", "Deleted");
     }
 
 }

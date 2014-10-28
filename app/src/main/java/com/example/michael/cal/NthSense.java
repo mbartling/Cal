@@ -39,9 +39,8 @@ public class NthSense extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
         calSqlAdapter = MainActivity.getAdapter();
-
         if(calSqlAdapter==null)
-            calSqlAdapter = new CalSqlAdapter(this);
+            calSqlAdapter = MainActivity.setAdapter(new CalSqlAdapter(this));
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
