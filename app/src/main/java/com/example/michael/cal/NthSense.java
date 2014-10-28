@@ -1,8 +1,10 @@
 package com.example.michael.cal;
 
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -30,6 +32,10 @@ public class NthSense extends Service implements SensorEventListener {
     private float epsilon = 0.0000001f;
 
     private boolean isWalking, isTakingData;
+    private int sampleCount = 0;
+    private static final int sampleBinSize = 32;
+
+    dataService sensorService;
 
     public NthSense() {
 
@@ -55,7 +61,11 @@ public class NthSense extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
+
+        Intent intent = new Intent(this, dataService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -84,6 +94,11 @@ public class NthSense extends Service implements SensorEventListener {
 
         long timestamp = System.currentTimeMillis();
         calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
+
+        //Package N samples and automatically send to server
+        sampleCount = (sampleCount + 1) % sampleBinSize;
+
+        if(is_window_filled()) sensorService.submitData();
     }
 
     @Override
@@ -95,7 +110,9 @@ public class NthSense extends Service implements SensorEventListener {
     public void onDestroy() {
         super.onDestroy();
         mSensorManager.unregisterListener(this);
+        unbindService(mConnection);
     }
+
 
     public class NthBinder extends Binder {
         NthSense getService() {
@@ -112,4 +129,25 @@ public class NthSense extends Service implements SensorEventListener {
         this.isTakingData = is_takingData;
         Log.i("NthSense", "Setting is Taking Data " + String.valueOf(this.isTakingData));
     }
+
+    public boolean is_window_filled(){
+        return (sampleCount == 0) ? true: false;
+    }
+
+
+    //===================================
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            dataService.dataBinder binder = (dataService.dataBinder) service;
+            sensorService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+
+        }
+    };
+
 }

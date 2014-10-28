@@ -104,11 +104,11 @@ public class MainActivity extends Activity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, TrainingFragment.newInstance(position + 1))
                         .commit();
-            } else if (position == 1) {
+            } /*else if (position == 1) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, DBDevFrag.newInstance(position + 1))
                         .commit();
-            } else if (position == 4) {
+            }*/ else if (position == 4) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))
                         .commit();
@@ -181,6 +181,7 @@ public class MainActivity extends Activity
     @Override
     protected void onResume(){
         super.onResume();
+
 
     }
 

@@ -41,6 +41,7 @@ public class DBDevFrag extends PlaceholderFragment{
         mclearDbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 sensorService.clearDatabase();
             }
         });
