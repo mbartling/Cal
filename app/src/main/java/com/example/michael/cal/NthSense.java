@@ -52,9 +52,8 @@ public class NthSense extends Service implements SensorEventListener {
 
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        proxMax = mProximity.getMaximumRange(); //Will treat this value as binary close, not-close
-        // See Android Proximity Sensor Documentation
-        mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        proxMax = mProximity.getMaximumRange();                                                     //Will treat this value as binary close, not-close
+        mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);                                //See Android Proximity Sensor Documentation
         isWalking = false;
         isTakingData = false;
 
@@ -88,15 +87,13 @@ public class NthSense extends Service implements SensorEventListener {
         float y = accelVals[1];
         float z = accelVals[2];
 
-        //converts boolean to 1 or 0 for storage in database
-        int d_isWalking = (isWalking) ? 1 : 0;
+        int d_isWalking = (isWalking) ? 1 : 0;                                                      //converts boolean to 1 or 0 for storage in database
         int d_isTrainingData = (isTakingData) ? 1 : 0;
 
         long timestamp = System.currentTimeMillis();
         calSqlAdapter.insertData(new CalSQLObj(x,y,z,proximityVal,lux,d_isWalking,d_isTrainingData,timestamp)); //Insert data into local db
 
-        //Package N samples and automatically send to server
-        sampleCount = (sampleCount + 1) % sampleBinSize;
+        sampleCount = (sampleCount + 1) % sampleBinSize;                                            //Package N samples and automatically send to server
 
         if(is_window_filled()) sensorService.submitData();
     }
@@ -134,8 +131,6 @@ public class NthSense extends Service implements SensorEventListener {
         return (sampleCount == 0) ? true: false;
     }
 
-
-    //===================================
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
