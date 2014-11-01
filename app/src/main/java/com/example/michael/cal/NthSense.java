@@ -65,7 +65,6 @@ public class NthSense extends Service implements SensorEventListener {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
-
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
@@ -105,9 +104,9 @@ public class NthSense extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mSensorManager.unregisterListener(this);
         unbindService(mConnection);
+        super.onDestroy();
     }
 
 
