@@ -16,16 +16,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text=""
+        android:text="Press the Start button and place the\n     phone on a flat surface for 10s."
         android:id="@+id/timeCounter"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="55dp" />
+        android:layout_marginTop="85dp" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

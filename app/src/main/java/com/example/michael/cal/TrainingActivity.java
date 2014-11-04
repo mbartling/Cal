@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -33,8 +34,8 @@ public class TrainingActivity extends Activity{
     DecimalFormat time;
     long startTime,currTime;
     ImageView image;
-
-    boolean start = false;
+    int clickCount = 0;
+    Vibrator v;
 
     public static CalSqlAdapter getAdapter(){
         return calSqlAdapter;
@@ -46,6 +47,7 @@ public class TrainingActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         setContentView(R.layout.activity_training);
         text = (TextView) findViewById(R.id.timeCounter);
         button = (Button) findViewById(R.id.training_button);
@@ -58,7 +60,7 @@ public class TrainingActivity extends Activity{
             @Override
             public void onClick(View view) {
                 startTime=System.currentTimeMillis();
-                start = true;
+                clickCount++;
                 image.setImageResource(R.drawable.phoneondesk);
                 button.setVisibility(View.GONE);
             }
@@ -73,8 +75,13 @@ public class TrainingActivity extends Activity{
                     public void run()
                     {
                         currTime=System.currentTimeMillis();
-                        if(start) {
+                        if(clickCount==1) {
                             text.setText("Time: "+time.format((float)(currTime-startTime)/1000)+"s");
+                            if((currTime-startTime)>10000){
+                                clickCount++;
+                                button.setVisibility(View.VISIBLE);
+                                v.vibrate(250);
+                            }
                         }
                     }
                 });
