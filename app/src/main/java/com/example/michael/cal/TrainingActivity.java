@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -29,7 +30,7 @@ public class TrainingActivity extends Activity{
     private static CalSqlAdapter calSqlAdapter;
     NthSense sensorService;
     Timer T=new Timer();
-    TextView text;
+    TextView text,second;
     Button button;
     DecimalFormat time;
     long startTime,currTime;
@@ -50,19 +51,41 @@ public class TrainingActivity extends Activity{
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         setContentView(R.layout.activity_training);
         text = (TextView) findViewById(R.id.timeCounter);
+        second = (TextView) findViewById(R.id.secondText);
         button = (Button) findViewById(R.id.training_button);
         image = (ImageView) findViewById(R.id.imageView);
         Intent intent = new Intent(this, NthSense.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         time = new DecimalFormat(".#");
 
+        text.setText("Press the Start button and place the\n     phone on a flat surface for 10s.");
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startTime=System.currentTimeMillis();
-                clickCount++;
-                image.setImageResource(R.drawable.phoneondesk);
+                if(clickCount==0){
+                    image.setImageResource(R.drawable.phoneondesk);
+                    sensorService.set_is_takingData(true);
+                }
+                else if(clickCount==2){
+                    //image.setImageResource();
+                    image.setVisibility(View.VISIBLE);
+                    second.setVisibility(View.GONE);
+                    sensorService.set_is_takingData(true);
+                }
+                else if(clickCount==4){
+                    //image.setImageResource();
+                    image.setVisibility(View.VISIBLE);
+                    second.setVisibility(View.GONE);
+                    sensorService.set_is_takingData(true);
+                    sensorService.set_is_walking(true);
+                }
+                else if(clickCount==6){
+                    //send app to MainActivity
+                }
                 button.setVisibility(View.GONE);
+                clickCount++;
+                startTime=System.currentTimeMillis();
             }
         });
 
@@ -76,11 +99,38 @@ public class TrainingActivity extends Activity{
                     {
                         currTime=System.currentTimeMillis();
                         if(clickCount==1) {
-                            text.setText("Time: "+time.format((float)(currTime-startTime)/1000)+"s");
-                            if((currTime-startTime)>10000){
+                            text.setText("Time: " + time.format((float) (currTime - startTime) / 1000) + "s");
+                            if ((currTime - startTime) > 10000) {
+                                sensorService.set_is_takingData(false);
+                                image.setVisibility(View.GONE);
                                 clickCount++;
                                 button.setVisibility(View.VISIBLE);
-                                v.vibrate(250);
+                                v.vibrate(500);
+                                text.setText("Press the start button and place the \n      phone in your pocket for 15s.");
+                                second.setText("(Phone will vibrate on completion)");
+                            }
+                        }
+                        else if(clickCount==3) {
+                            text.setText("Time: "+time.format((float)(currTime-startTime)/1000)+"s");
+                            if ((currTime - startTime) > 15000) {
+                                sensorService.set_is_takingData(false);
+                                image.setVisibility(View.GONE);
+                                clickCount++;
+                                button.setVisibility(View.VISIBLE);
+                                v.vibrate(500);
+                                text.setText("Press the Start button and with the\n        phone in your pocket walk\n                  around for 10s");
+                            }
+                        }
+                        else if(clickCount==5) {
+                            text.setText("Time: "+time.format((float)(currTime-startTime)/1000)+"s");
+                            if ((currTime - startTime) > 10000) {
+                                sensorService.set_is_takingData(false);
+                                sensorService.set_is_walking(false);
+                                image.setVisibility(View.GONE);
+                                clickCount++;
+                                button.setVisibility(View.VISIBLE);
+                                v.vibrate(500);
+                                text.setText("Press the Start button to continue to the main app");
                             }
                         }
                     }
