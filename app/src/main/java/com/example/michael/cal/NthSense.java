@@ -20,6 +20,7 @@ public class NthSense extends Service implements SensorEventListener {
     private Sensor mAccel;
     private Sensor mProximity;
     private Sensor mLight;
+    boolean prox;
 
     private IBinder mBinder = new NthBinder();
 
@@ -52,7 +53,7 @@ public class NthSense extends Service implements SensorEventListener {
 
         mAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        proxMax = mProximity.getMaximumRange();                                                     //Will treat this value as binary close, not-close
+        try{proxMax = mProximity.getMaximumRange();}catch(Exception e){prox=true;}                  //Will treat this value as binary close, not-close
         mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);                                //See Android Proximity Sensor Documentation
         isWalking = false;
         isTakingData = false;
