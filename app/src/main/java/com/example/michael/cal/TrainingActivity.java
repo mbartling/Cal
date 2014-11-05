@@ -68,13 +68,13 @@ public class TrainingActivity extends Activity{
                     sensorService.set_is_takingData(true);
                 }
                 else if(clickCount==2){
-                    //image.setImageResource();
+                    image.setImageResource(R.drawable.phoneinpocket);
                     image.setVisibility(View.VISIBLE);
                     second.setVisibility(View.GONE);
                     sensorService.set_is_takingData(true);
                 }
                 else if(clickCount==4){
-                    //image.setImageResource();
+                    image.setImageResource(R.drawable.walkingwithphone);
                     image.setVisibility(View.VISIBLE);
                     second.setVisibility(View.GONE);
                     sensorService.set_is_takingData(true);
@@ -115,6 +115,7 @@ public class TrainingActivity extends Activity{
                             if ((currTime - startTime) > 15000) {
                                 sensorService.set_is_takingData(false);
                                 image.setVisibility(View.GONE);
+                                second.setVisibility(View.VISIBLE);
                                 clickCount++;
                                 button.setVisibility(View.VISIBLE);
                                 v.vibrate(500);
