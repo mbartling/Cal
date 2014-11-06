@@ -62,9 +62,9 @@ public class TrainingFragment extends PlaceholderFragment {
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
-    public void onDestroy() { //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
-        super.onDestroy();
+    public void onDestroy() {                                                                       //Michael claims "possibly dangerous" DO NOT STORE NEAR OPEN FLAMES
         getActivity().unbindService(mConnection);
+        super.onDestroy();
     }
 
     @Override

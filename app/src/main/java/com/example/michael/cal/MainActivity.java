@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,10 +13,7 @@ import android.widget.Toast;
 
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
 
-
-public class MainActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccelFragment.AccelerometerInterface{
-
+public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccelFragment.AccelerometerInterface{
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -25,24 +21,16 @@ public class MainActivity extends Activity
 
     private static CalSqlAdapter calSqlAdapter;
 
-    private int currPosition;
     private boolean isTakingData, isWalking;
     public String timeStamp;
-    DataSaverPlaceholder myDataLogger;
-
-    private boolean isSaved;
-
-    //Fragment mContent;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    //CalSqlAdapter calSqlAdapter;
 
     public static CalSqlAdapter getAdapter(){
         return calSqlAdapter;
     }
-
     public static CalSqlAdapter setAdapter(CalSqlAdapter c){
        return calSqlAdapter = c;
     }
@@ -51,64 +39,30 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
-
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
+        mNavigationDrawerFragment.setUp(                                                            // Set up the drawer.
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
-
-        currPosition = 0;
-
-        isTakingData =false;
         isWalking = false;
-
-        //calSqlAdapter = new CalSqlAdapter(this);
-
-        //SQLiteDatabase sensorDatabase = calSqlAdapter.getWritableDatabase();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-       // FragmentManager fragmentManager = getFragmentManager();
-       // fragmentManager.putFragment(outState, "mContent", mContent);
         outState.putString("timeStamp", timeStamp);
-
     }
-
-/*    @Override
-    public void onNavigationDrawerItemSelected(
-            int position, boolean fromSavedInstanceState) {
-
-        if (!fromSavedInstanceState) {
-            // update the main content by replacing fragments
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container,
-                            PlaceholderFragment.newInstance(position + 1))
-                    .commit();
-        }
-    }*/
 
     @Override
     public void onNavigationDrawerItemSelected(int position, boolean fromSavedInstanceState) {
-        // update the main content by replacing fragments
-        if (!fromSavedInstanceState) {
+        if (!fromSavedInstanceState) {                                                              // update the main content by replacing fragments
             FragmentManager fragmentManager = getFragmentManager();
             if (position == 0) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, TrainingFragment.newInstance(position + 1))
                         .commit();
-            } /*else if (position == 1) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, DBDevFrag.newInstance(position + 1))
-                        .commit();
-            }*/ else if (position == 4) {
+            } else if (position == 4) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, CalNetworkFragment.newInstance(position + 1))
                         .commit();
@@ -124,7 +78,6 @@ public class MainActivity extends Activity
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
-
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
@@ -139,7 +92,6 @@ public class MainActivity extends Activity
                 mTitle = getString(R.string.title_section5);
                 break;
         }
-        currPosition = number;
     }
 
     public void restoreActionBar() {
@@ -149,46 +101,33 @@ public class MainActivity extends Activity
         actionBar.setTitle(mTitle);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
-            restoreActionBar();
-            return true;
+            getMenuInflater().inflate(R.menu.main, menu);                                           // Only show items in the action bar relevant to this screen
+            restoreActionBar();                                                                     // if the drawer is not showing. Otherwise, let the drawer
+            return true;                                                                            // decide what to show in the action bar.
         }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        int id = item.getItemId();                                                                  // Handle action bar item clicks here. The action bar will
+        if (id == R.id.action_settings) {                                                           // automatically handle clicks on the Home/Up button, so long
+            return true;                                                                            // as you specify a parent activity in AndroidManifest.xml.
         }
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
     @Override
     protected void onResume(){
         super.onResume();
-
-
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-
     }
 
     @Override
@@ -201,7 +140,6 @@ public class MainActivity extends Activity
         isWalking = state;
         Context context = getApplicationContext();
         String walkingState;
-
         if (isWalking)
         {
             walkingState = "walking!";
@@ -212,6 +150,4 @@ public class MainActivity extends Activity
         toast.show();
 
     }
-
-
 }

@@ -138,7 +138,6 @@ public class AccelFragment extends PlaceholderFragment{
     }
 
     public interface AccelerometerInterface {
-
         public void setIsTakingData(boolean state);
         public void setWalkingState(boolean state);
     }
