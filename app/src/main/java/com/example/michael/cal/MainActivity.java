@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
        return calSqlAdapter = c;
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
