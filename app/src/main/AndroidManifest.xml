@@ -19,6 +19,15 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".TrainingActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
         <service
             android:name=".NthSense"
             android:enabled="true"
