@@ -3,7 +3,7 @@
 
 .. [Yau] S. Yau and F. Karim, "An Adaptive Middleware for Context-Sensitive Communications for Real-Time Applications in Ubiquitous Computing Environments," in *Real-Time Systems*, 2004
 
-.. [Yau1] S. Yau and F. Karim, "Reconfigurable Context Sensitive Middleware for Pervasime Computing", 2002
+.. [Yau1] S. Yau and F. Karim, "Reconfigurable Context Sensitive Middleware for Pervasive Computing", 2002
 
 .. [Krum] J. Krumm and E. Horvitz. Locadio: "Inferring motion and location from wi-fi signal strengths." IEEE Computer Society, 2004. 
 
