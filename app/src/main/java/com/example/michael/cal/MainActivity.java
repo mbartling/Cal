@@ -1,11 +1,17 @@
 package com.example.michael.cal;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 
 import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +29,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
     private boolean isTakingData, isWalking;
     public String timeStamp;
+    private String GoogleAccountEmail;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -34,8 +41,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
     public static CalSqlAdapter setAdapter(CalSqlAdapter c){
        return calSqlAdapter = c;
     }
+    public static final String TAG = "CalNsd";
 
+    CalNsdManager mNsdManager;
+    CalNsdConnection mConnection;
 
+    private Handler mUpdateHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +58,34 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
         isWalking = false;
-    }
 
+        mUpdateHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                String chatLine = msg.getData().getString("msg");
+                Log.d(TAG, chatLine);
+            }
+        };
+        getGoogleAccountEmail();
+        mConnection = new CalNsdConnection(mUpdateHandler);
+
+        mNsdManager = new CalNsdManager(this);
+        mNsdManager.initializeNsd();
+    }
+    public String getGoogleAccountEmail() {
+        if (GoogleAccountEmail == null) {
+            AccountManager am = (AccountManager) this.getSystemService(this.ACCOUNT_SERVICE);
+            Account[] accounts = am.getAccounts();
+            for (Account a : accounts) {
+                if (a.type.equals("com.google")) {
+                    GoogleAccountEmail = a.name;
+                    return GoogleAccountEmail;
+                }
+            }
+            return null;
+        }
+        return GoogleAccountEmail;
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -115,20 +152,74 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();                                                                  // Handle action bar item clicks here. The action bar will
-        if (id == R.id.action_settings) {                                                           // automatically handle clicks on the Home/Up button, so long
-            return true;                                                                            // as you specify a parent activity in AndroidManifest.xml.
+        //if (id == R.id.action_settings) {                                                           // automatically handle clicks on the Home/Up button, so long
+        //    return true;                                                                            // as you specify a parent activity in AndroidManifest.xml.
+        //}
+        switch (id){
+            case R.id.action_settings:
+                return true;
+            case R.id.action_advertise:
+                do_advertise();
+                return true;
+            case R.id.action_discover:
+                do_discover();
+                return true;
+            case R.id.action_connect:
+                do_connect();
+                return true;
+            case R.id.action_send:
+                mConnection.sendMessage(GoogleAccountEmail);
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
+    public void do_advertise(){
+        if(mConnection.getLocalPort() > -1) {
+            mNsdManager.registerService(mConnection.getLocalPort());
+        } else {
+            Log.d(TAG, "ServerSocket isn't bound.");
+        }
+    }
+    public void do_discover()
+    {
+        mNsdManager.discoverServices();
+    }
+    public void do_connect()
+    {
+        NsdServiceInfo service = mNsdManager.getChosenServiceInfo();
+        if (service != null) {
+            Log.d(TAG, "Connecting. Sending " + GoogleAccountEmail);
+            mConnection.connectToServer(service.getHost(),
+                    service.getPort());
+            mConnection.sendMessage(GoogleAccountEmail);
+
+        } else {
+            Log.d(TAG, "No service to connect to!");
+        }
+    }
     @Override
     protected void onResume(){
         super.onResume();
+        if(mNsdManager != null){
+            mNsdManager.discoverServices();
+        }
     }
 
     @Override
     protected void onPause(){
+        if(mNsdManager != null){
+            mNsdManager.stopDiscovery();
+        }
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mNsdManager.tearDown();
+        mConnection.tearDown();
+        super.onDestroy();
     }
 
     @Override

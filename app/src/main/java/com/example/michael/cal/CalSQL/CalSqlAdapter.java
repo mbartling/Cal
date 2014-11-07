@@ -28,13 +28,10 @@ public class CalSqlAdapter {
 
     public String getGoogleAccountEmail() {
         if (GoogleAccountEmail == null) {
-            //not sure if I should just save the context reference from this class itself
             AccountManager am = (AccountManager) helper.context.getSystemService(helper.context.ACCOUNT_SERVICE);
             Account[] accounts = am.getAccounts();
             for (Account a : accounts) {
-                //apparently, the "main" account on the device will be returned first in this list
                 if (a.type.equals("com.google")) {
-                    //Not really sure whether this pulls an email address or not. TO FIX LATER IF NECESSARY.
                     GoogleAccountEmail = a.name;
                     return GoogleAccountEmail;
                 }
