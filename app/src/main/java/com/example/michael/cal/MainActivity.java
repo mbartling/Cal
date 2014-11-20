@@ -6,10 +6,14 @@ import android.app.Activity;
 
 import android.app.ActionBar;
 import android.app.FragmentManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
@@ -18,7 +22,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
-import com.example.michael.cal.WiFi.dataServiceWiFi;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccelFragment.AccelerometerInterface{
     /**
@@ -69,10 +72,14 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
             }
         };
         getGoogleAccountEmail();
+
+        Intent intent = new Intent(this, dataServiceWiFi.class);
+        bindService(intent, mConnectionWifi, Context.BIND_AUTO_CREATE);
+
         mConnection = new CalNsdConnection(mUpdateHandler);
 
-        mNsdManager = new CalNsdManager(this);
-        mNsdManager.initializeNsd();
+       // mNsdManager = new CalNsdManager(this);
+       // mNsdManager.initializeNsd();
     }
     public String getGoogleAccountEmail() {
         if (GoogleAccountEmail == null) {
@@ -219,9 +226,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
     @Override
     protected void onDestroy() {
-        mNsdManager.tearDown();
-        mConnection.tearDown();
-
+       // mNsdManager.tearDown();
+       // mConnection.tearDown();
+        unbindService(mConnectionWifi);
         super.onDestroy();
     }
 
@@ -245,4 +252,18 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
         toast.show();
 
     }
+
+    private ServiceConnection mConnectionWifi = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            dataServiceWiFi.dataBinder binder = (dataServiceWiFi.dataBinder) service;
+            mWifiService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+
+        }
+    };
 }

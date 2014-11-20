@@ -1,4 +1,4 @@
-package com.example.michael.cal.WiFi;
+package com.example.michael.cal;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -15,9 +15,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.michael.cal.CalNetwork.PostData;
-import com.example.michael.cal.CalSQL.CalSQLObj;
-import com.example.michael.cal.CalSQL.CalSqlAdapter;
-import com.example.michael.cal.MainActivity;
 
 import org.apache.http.HttpResponse;
 import org.json.JSONArray;
@@ -35,7 +32,7 @@ public class dataServiceWiFi extends Service {
     WifiManager mWifiManager;
     WifiScanReceiver mWifiScanReceiver;
 
-    private final int numSeconds = 5;
+    private final int numSeconds = 15;
 
     public dataServiceWiFi() {
     }
@@ -55,6 +52,7 @@ public class dataServiceWiFi extends Service {
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         mWifiScanReceiver = new WifiScanReceiver();
         registerReceiver(mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        startScan();
     }
 
     @Override
@@ -91,7 +89,7 @@ public class dataServiceWiFi extends Service {
     public void submitData(List<ScanResult> cso) {
                       //Submits localDatabase to server
         String json = createJSONObjWithEmail(cso).toString();
-        Log.i("DataBase", "Attempting to send "+Integer.toString(json.split("\\}").length - 1)+" entries");
+        Log.i("DataBaseWifi", "Attempting to send "+Integer.toString(json.split("\\}").length - 1)+" entries");
         try {
             HttpResponse httpr = new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert_wifi.php", json)).get();
             if (httpr != null) {
@@ -101,7 +99,7 @@ public class dataServiceWiFi extends Service {
                     return;
                 }
             }
-            Log.i("DataBase:", "There was a problem with this HTTP requst.");                       //Request failed
+            Log.i("DataBaseWifi:", "There was a problem with this HTTP requst.");                       //Request failed
 
         } catch (InterruptedException e) {
             e.printStackTrace();
