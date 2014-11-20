@@ -93,7 +93,7 @@ public class dataServiceWiFi extends Service {
         String json = createJSONObjWithEmail(cso).toString();
         Log.i("DataBase", "Attempting to send "+Integer.toString(json.split("\\}").length - 1)+" entries");
         try {
-            HttpResponse httpr = new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert.php", json)).get();
+            HttpResponse httpr = new PostData.PostDataTask().execute(new PostData.PostDataObj("http://grantuy.com/cal/insert_wifi.php", json)).get();
             if (httpr != null) {
                 if (httpr.getStatusLine().getStatusCode() == 200) {
                     Log.i("DataBase", "Sending Successful");                                        //Request successful

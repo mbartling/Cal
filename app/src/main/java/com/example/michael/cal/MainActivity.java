@@ -18,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import com.example.michael.cal.CalSQL.CalSqlAdapter;
+import com.example.michael.cal.WiFi.dataServiceWiFi;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccelFragment.AccelerometerInterface{
     /**
@@ -45,6 +46,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
     CalNsdManager mNsdManager;
     CalNsdConnection mConnection;
+    dataServiceWiFi mWifiService;
 
     private Handler mUpdateHandler;
     @Override
@@ -219,6 +221,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
     protected void onDestroy() {
         mNsdManager.tearDown();
         mConnection.tearDown();
+
         super.onDestroy();
     }
 

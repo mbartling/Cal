@@ -39,6 +39,11 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <service
+            android:name=".WiFi.dataServiceWiFi"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
     <!-- To access Google+ APIs: -->
