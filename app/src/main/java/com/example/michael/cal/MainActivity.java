@@ -47,8 +47,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
     }
     public static final String TAG = "CalNsd";
 
-    CalNsdManager mNsdManager;
-    CalNsdConnection mConnection;
+   // CalNsdManager mNsdManager;
+   // CalNsdConnection mConnection;
     dataServiceWiFi mWifiService;
 
     private Handler mUpdateHandler;
@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
         Intent intent = new Intent(this, dataServiceWiFi.class);
         bindService(intent, mConnectionWifi, Context.BIND_AUTO_CREATE);
 
-        mConnection = new CalNsdConnection(mUpdateHandler);
+        //mConnection = new CalNsdConnection(mUpdateHandler);
 
        // mNsdManager = new CalNsdManager(this);
        // mNsdManager.initializeNsd();
@@ -177,7 +177,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
                 do_connect();
                 return true;
             case R.id.action_send:
-                mConnection.sendMessage(GoogleAccountEmail);
+            //    mConnection.sendMessage(GoogleAccountEmail);
                 return true;
         }
 
@@ -185,19 +185,20 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
     }
 
     public void do_advertise(){
-        if(mConnection.getLocalPort() > -1) {
+       /* if(mConnection.getLocalPort() > -1) {
             mNsdManager.registerService(mConnection.getLocalPort());
         } else {
             Log.d(TAG, "ServerSocket isn't bound.");
         }
+        */
     }
     public void do_discover()
     {
-        mNsdManager.discoverServices();
+       // mNsdManager.discoverServices();
     }
     public void do_connect()
     {
-        NsdServiceInfo service = mNsdManager.getChosenServiceInfo();
+       /* NsdServiceInfo service = mNsdManager.getChosenServiceInfo();
         if (service != null) {
             Log.d(TAG, "Connecting. Sending " + GoogleAccountEmail);
             mConnection.connectToServer(service.getHost(),
@@ -207,20 +208,25 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
         } else {
             Log.d(TAG, "No service to connect to!");
         }
+        */
     }
     @Override
     protected void onResume(){
         super.onResume();
+        /*
         if(mNsdManager != null){
             mNsdManager.discoverServices();
         }
+        */
     }
 
     @Override
     protected void onPause(){
+        /*
         if(mNsdManager != null){
             mNsdManager.stopDiscovery();
         }
+        */
         super.onPause();
     }
 
